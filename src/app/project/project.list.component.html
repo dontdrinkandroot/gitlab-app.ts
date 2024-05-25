@@ -1,0 +1,39 @@
+<div class="ga-mat-fixed-toolbar-container">
+    <mat-toolbar>
+        <ga-mat-sidenav-toggle></ga-mat-sidenav-toggle>
+        <h1>Projects</h1>
+    </mat-toolbar>
+</div>
+
+<div class="ga-content-container">
+    <div class="d-flex flex-column">
+        <mat-form-field appearance="outline" class="search mx-half">
+            <mat-icon matPrefix>search</mat-icon>
+            <input type="search" matInput placeholder="Search" [formControl]="searchControl"/>
+            <!--        <button mat-icon-button matSuffix (click)="searchControl.setValue('')" [attr.aria-label]="'Clear search'">-->
+            <!--            <mat-icon>close</mat-icon>-->
+            <!--        </button>-->
+        </mat-form-field>
+    </div>
+
+    @if (filteredProjects$|async; as projects) {
+        <mat-nav-list>
+            @for (project of projects; track project.id) {
+                <a mat-list-item [routerLink]="['/',(instance$|async)?.host, 'projects',project.id]">
+                    @if (project.avatar_url) {
+                        <img matListItemAvatar [ngSrc]="project.id|gaProjectAvatarUrl|gaAppendToken" width="64"
+                             height="64"/>
+                    } @else {
+                        <img matListItemAvatar [src]="project|gaProjectGenericAvatarData"/>
+                    }
+                    <p matListItemTitle>{{ project.name }}</p>
+                    <p matListItemLine>{{ project.namespace.full_path }}</p>
+                </a>
+            }
+        </mat-nav-list>
+    } @else {
+        <div class="d-flex justify-content-center my-half">
+            <mat-progress-spinner [mode]="'indeterminate'" [diameter]="24"></mat-progress-spinner>
+        </div>
+    }
+</div>

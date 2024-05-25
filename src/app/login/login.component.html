@@ -1,0 +1,18 @@
+<form class="d-flex flex-column" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <mat-form-field floatLabel="always">
+        <mat-label>Instance</mat-label>
+        <input matInput type="text" formControlName="instance" [required]="true">
+        <span matTextPrefix>https://</span>
+    </mat-form-field>
+
+    <mat-form-field>
+        <mat-label>Token</mat-label>
+        <input matInput [type]="hideToken ? 'password' : 'text'" formControlName="token" [required]="true">
+        <button mat-icon-button matSuffix (click)="hideToken = !hideToken" [attr.aria-label]="'Hide password'"
+                [attr.aria-pressed]="hideToken">
+            <mat-icon>{{ hideToken ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+    </mat-form-field>
+
+    <button type="submit" mat-flat-button color="primary" [disabled]="!loginForm.valid">Connect</button>
+</form>

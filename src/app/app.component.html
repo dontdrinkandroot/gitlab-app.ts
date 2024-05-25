@@ -1,0 +1,67 @@
+<ng-progress></ng-progress>
+
+<mat-sidenav-container [ngClass]="(sidenavMode$|async) ?? 'over'">
+    <mat-sidenav
+            [opened]="sidenavOpened$|async"
+            [mode]="(sidenavMode$|async) ?? 'over'"
+            [fixedInViewport]="true"
+    >
+        <div class="ga-mat-fixed-toolbar-container">
+            <mat-toolbar>
+                <h1 class="ga-mat-heading">GitlabApp</h1>
+            </mat-toolbar>
+        </div>
+
+        @if (currentInstance$|async; as currentInstance) {
+            <mat-nav-list>
+
+                <mat-list-item>
+                    <p matListItemTitle>{{ currentInstance.host }}</p>
+                    <p matListItemLine>{{ currentInstance.username }}</p>
+                    <div matListItemMeta>
+                        <a mat-icon-button [routerLink]="['/']">
+                            <mat-icon>swap_horiz</mat-icon>
+                        </a>
+                    </div>
+                </mat-list-item>
+
+                <mat-divider></mat-divider>
+
+                <a mat-list-item [routerLink]="['/', currentInstance.host, 'groups']"
+                   [routerLinkActive]="['mdc-list-item--activated']" [routerLinkActiveOptions]="{exact:true}">
+                    Groups
+                </a>
+                <a mat-list-item [routerLink]="['/', currentInstance.host, 'projects']"
+                   [routerLinkActive]="['mdc-list-item--activated']" [routerLinkActiveOptions]="{exact:true}">
+                    Projects
+                </a>
+
+                @if (currentProject$|async; as currentProject) {
+
+                    <mat-divider></mat-divider>
+
+                    <div matSubheader class="mat-title-small">{{ currentProject.name }}</div>
+
+                    <a mat-list-item [routerLink]="['/', currentInstance.host, 'projects', currentProject.id]"
+                       [routerLinkActive]="['mdc-list-item--activated']"
+                       [routerLinkActiveOptions]="{exact:true}">
+                        Project
+                    </a>
+                    <a mat-list-item
+                       [routerLink]="['/', currentInstance.host, 'projects', currentProject.id, 'issues']"
+                       [routerLinkActive]="['mdc-list-item--activated']">
+                        Issues
+                    </a>
+                    <a mat-list-item
+                       [routerLink]="['/', currentInstance.host, 'projects', currentProject.id, 'pipelines']"
+                       [routerLinkActive]="['mdc-list-item--activated']">
+                        Pipelines
+                    </a>
+                }
+            </mat-nav-list>
+        }
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <router-outlet></router-outlet>
+    </mat-sidenav-content>
+</mat-sidenav-container>

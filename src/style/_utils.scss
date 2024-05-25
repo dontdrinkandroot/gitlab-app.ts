@@ -1,0 +1,181 @@
+.d-flex {
+    display: flex;
+}
+
+.flex-row {
+    flex-direction: row;
+}
+
+.flex-column {
+    flex-direction: column;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.justify-content-center {
+    justify-content: center;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.align-items-start {
+    align-items: flex-start;
+}
+
+.align-items-end {
+    align-items: flex-end;
+}
+
+.align-items-baseline {
+    align-items: baseline;
+}
+
+.align-items-stretch {
+    align-items: stretch;
+}
+
+.align-self-center {
+    align-self: center;
+}
+
+.align-self-start {
+    align-self: flex-start;
+}
+
+.align-self-end {
+    align-self: flex-end;
+}
+
+.align-self-baseline {
+    align-self: baseline;
+}
+
+.align-self-stretch {
+    align-self: stretch;
+}
+
+.justify-content-start {
+    justify-content: flex-start;
+}
+
+.justify-content-end {
+    justify-content: flex-end;
+}
+
+.justify-content-between {
+    justify-content: space-between;
+}
+
+.justify-content-around {
+    justify-content: space-around;
+}
+
+.justify-content-evenly {
+    justify-content: space-evenly;
+}
+
+.flex-fill {
+    flex: 1 1 auto;
+}
+
+$ga-spacer: 1rem !default;
+$ga-spacers: (
+        'none': 0,
+        'quarter': $ga-spacer * .25,
+        'half': $ga-spacer * .5,
+        'full': $ga-spacer,
+        'double': $ga-spacer * 3,
+) !default;
+
+$ga-paddings: (
+        'p': 'padding',
+        'ps': 'padding-left',
+        'pe': 'padding-right',
+        'pt': 'padding-top',
+        'pb': 'padding-bottom'
+) !default;
+
+$ga-margins: (
+        'm': 'margin',
+        'ms': 'margin-left',
+        'me': 'margin-right',
+        'mt': 'margin-top',
+        'mb': 'margin-bottom'
+) !default;
+
+@each $prefix, $property in $ga-paddings {
+    @each $suffix, $size in $ga-spacers {
+        .#{$prefix}-#{$suffix} {
+            #{$property}: #{$size} !important;
+        }
+    }
+}
+
+@each $suffix, $size in $ga-spacers {
+    .px-#{$suffix} {
+        padding-left: #{$size} !important;
+        padding-right: #{$size} !important;
+    }
+
+    .py-#{$suffix} {
+        padding-top: #{$size} !important;
+        padding-bottom: #{$size} !important;
+    }
+}
+
+@each $prefix, $property in $ga-margins {
+    @each $suffix, $size in $ga-spacers {
+        .#{$prefix}-#{$suffix} {
+            #{$property}: #{$size} !important;
+        }
+    }
+}
+
+@each $suffix, $size in $ga-spacers {
+    .mx-#{$suffix} {
+        margin-left: #{$size} !important;
+        margin-right: #{$size} !important;
+    }
+
+    .my-#{$suffix} {
+        margin-top: #{$size} !important;
+        margin-bottom: #{$size} !important;
+    }
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.text-danger {
+    color: #F44336 !important;
+}
+
+.text-warning {
+    color: #FFC107 !important;
+}
+
+.text-success {
+    color: #4CAF50 !important;
+}
+
+.text-info {
+    color: #03A9F4 !important;
+}
+
+$ga-breakpoint-xs: 0px;
+$ga-breakpoint-sm: 600px;
+$ga-breakpoint-md: 960px;
+$ga-breakpoint-lg: 1280px;
+$ga-breakpoint-xl: 1920px;
+$ga-breakpoints: (
+        xs: $ga-breakpoint-xs,
+        sm: $ga-breakpoint-sm,
+        md: $ga-breakpoint-md,
+        lg: $ga-breakpoint-lg,
+        xl: $ga-breakpoint-xl
+) !default;

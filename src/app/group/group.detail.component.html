@@ -1,0 +1,54 @@
+<div class="ga-mat-fixed-toolbar-container">
+    <mat-toolbar>
+        <ga-mat-sidenav-toggle></ga-mat-sidenav-toggle>
+        @if (group$|async; as group) {
+            <h1>{{ group.name }}</h1>
+        }
+    </mat-toolbar>
+</div>
+
+@if (subgroups$|async; as subgroups) {
+    @if (subgroups.length > 0) {
+        <h2 class="mat-title-small mx-full">Subgroups</h2>
+        <mat-nav-list class="pt-none mb-full">
+            @for (subgroup of subgroups; track subgroup.id) {
+                <a mat-list-item [routerLink]="['/', instance.host, 'groups', subgroup.id]">
+                    @if (subgroup.avatar_url) {
+                        <img matListItemAvatar [ngSrc]="subgroup.id|gaGroupAvatarUrl|gaAppendToken" width="64"
+                             height="64"/>
+                    } @else {
+                        <img matListItemAvatar/>
+                    }
+                    <p matListItemTitle>{{ subgroup.name }}</p>
+                </a>
+            }
+        </mat-nav-list>
+    }
+} @else {
+    <div class="d-flex justify-content-center mb-full">
+        <mat-progress-spinner [mode]="'indeterminate'" [diameter]="24"></mat-progress-spinner>
+    </div>
+}
+
+@if (projects$|async; as projects) {
+    @if (projects.length > 0) {
+        <h2 class="mat-title-small mx-full">Projects</h2>
+        <mat-nav-list class="pt-none mb-full">
+            @for (project of projects; track project.id) {
+                <a mat-list-item [routerLink]="['/',instance.host, 'projects',project.id]">
+                    @if (project.avatar_url) {
+                        <img matListItemAvatar [ngSrc]="project.id|gaProjectAvatarUrl|gaAppendToken" width="64"
+                             height="64"/>
+                    } @else {
+                        <img matListItemAvatar/>
+                    }
+                    <p matListItemTitle>{{ project.name }}</p>
+                </a>
+            }
+        </mat-nav-list>
+    }
+} @else {
+    <div class="d-flex justify-content-center mb-full">
+        <mat-progress-spinner [mode]="'indeterminate'" [diameter]="24"></mat-progress-spinner>
+    </div>
+}

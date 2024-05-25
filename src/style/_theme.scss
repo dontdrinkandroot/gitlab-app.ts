@@ -1,0 +1,117 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$light-theme: mat.define-theme((
+        color: (
+                primary: mat.$azure-palette,
+        ),
+));
+
+$dark-theme: mat.define-theme((
+        color: (
+                theme-type: dark,
+                primary: mat.$azure-palette,
+        ),
+));
+
+:root {
+    @include mat.all-component-themes($light-theme);
+    @media (prefers-color-scheme: dark) {
+        @include mat.all-component-colors($dark-theme);
+    }
+}
+
+@include mat.typography-hierarchy($light-theme);
+
+.mat-mdc-button {
+    &.mat-secondary {
+        @include mat.button-color($light-theme, $color-variant: secondary);
+        @media (prefers-color-scheme: dark) {
+            @include mat.button-color($dark-theme, $color-variant: secondary);
+        }
+    }
+
+    &.mat-tertiary {
+        @include mat.button-color($light-theme, $color-variant: tertiary);
+        @media (prefers-color-scheme: dark) {
+            @include mat.button-color($dark-theme, $color-variant: secondary);
+        }
+    }
+
+    &.mat-error {
+        @include mat.button-color($light-theme, $color-variant: error);
+        @media (prefers-color-scheme: dark) {
+            @include mat.button-color($dark-theme, $color-variant: secondary);
+        }
+    }
+}
+
+.mat-mdc-raised-button {
+    &.mat-secondary {
+        @include mat.button-color($light-theme, $color-variant: secondary);
+        @media (prefers-color-scheme: dark) {
+            @include mat.button-color($dark-theme, $color-variant: secondary);
+        }
+    }
+
+    &.mat-tertiary {
+        @include mat.button-color($light-theme, $color-variant: tertiary);
+        @media (prefers-color-scheme: dark) {
+            @include mat.button-color($dark-theme, $color-variant: secondary);
+        }
+    }
+
+    &.mat-error {
+        @include mat.button-color($light-theme, $color-variant: error);
+        @media (prefers-color-scheme: dark) {
+            @include mat.button-color($dark-theme, $color-variant: secondary);
+        }
+    }
+}
+
+.mat-mdc-outlined-button {
+    &.mat-secondary {
+        @include mat.button-color($light-theme, $color-variant: secondary);
+        @media (prefers-color-scheme: dark) {
+            @include mat.button-color($dark-theme, $color-variant: secondary);
+        }
+    }
+
+    &.mat-tertiary {
+        @include mat.button-color($light-theme, $color-variant: tertiary);
+        @media (prefers-color-scheme: dark) {
+            @include mat.button-color($dark-theme, $color-variant: secondary);
+        }
+    }
+
+    &.mat-error {
+        @include mat.button-color($light-theme, $color-variant: error);
+        @media (prefers-color-scheme: dark) {
+            @include mat.button-color($dark-theme, $color-variant: secondary);
+        }
+    }
+}
+
+.mat-mdc-unelevated-button {
+    &.mat-secondary {
+        @include mat.button-color($light-theme, $color-variant: secondary);
+        @media (prefers-color-scheme: dark) {
+            @include mat.button-color($dark-theme, $color-variant: secondary);
+        }
+    }
+
+    &.mat-tertiary {
+        @include mat.button-color($light-theme, $color-variant: tertiary);
+        @media (prefers-color-scheme: dark) {
+            @include mat.button-color($dark-theme, $color-variant: secondary);
+        }
+    }
+
+    &.mat-error {
+        @include mat.button-color($light-theme, $color-variant: error);
+        @media (prefers-color-scheme: dark) {
+            @include mat.button-color($dark-theme, $color-variant: secondary);
+        }
+    }
+}

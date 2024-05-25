@@ -1,0 +1,103 @@
+@use '@angular/material' as mat;
+
+.mat-sidenav-container {
+
+    .mat-sidenav {
+
+        &.mat-drawer-over {
+            max-width: 90vw;
+        }
+
+        .mat-mdc-nav-list {
+            .mat-mdc-list-item {
+                width: auto;
+                margin-right: .5rem;
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+            }
+        }
+
+        .ga-mat-fixed-toolbar-container {
+            display: none;
+            @media (min-width: $ga-breakpoint-md) {
+                display: block;
+                .mat-toolbar {
+                    width: 360px;
+                }
+            }
+        }
+    }
+
+    .mat-sidenav-content {
+        min-height: 100vh;
+    }
+}
+
+body.scrolled {
+    .ga-mat-fixed-toolbar-container {
+        .mat-toolbar {
+            background: mat.get-theme-color($light-theme, 'surface-container');
+            @media (prefers-color-scheme: dark) {
+                background: mat.get-theme-color($dark-theme, 'surface-container');
+            }
+        }
+    }
+}
+
+.mat-toolbar {
+
+    .ga-mat-heading {
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        flex: 1 1 auto !important;
+    }
+
+    ga-mat-sidenav-toggle {
+        margin-right: .5rem;
+        @media (min-width: $ga-breakpoint-md) {
+            display: none;
+        }
+    }
+}
+
+.ga-mat-fixed-toolbar-container {
+    height: var(--mat-toolbar-mobile-height);
+    @media (min-width: $ga-breakpoint-sm) {
+        height: var(--mat-toolbar-standard-height);
+    }
+
+    .mat-toolbar {
+        position: fixed;
+        z-index: 2;
+    }
+}
+
+.ga-mat-fab-container {
+    height: calc(56px + 2rem);
+
+    .mdc-fab {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+    }
+}
+
+a.mat-mdc-list-item-title {
+    text-decoration: none;
+}
+
+p.mat-mdc-list-item-title, p.mat-mdc-list-item-line {
+    margin-bottom: 0;
+}
+
+.mat-mdc-list-item {
+    &.mdc-list-item--with-two-lines {
+        .mat-mdc-list-item-meta {
+            .mat-mdc-icon-button {
+                margin-top: 12px;
+            }
+        }
+    }
+}
+

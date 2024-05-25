@@ -1,0 +1,29 @@
+<div class="ga-mat-fixed-toolbar-container">
+    <mat-toolbar>
+        <ga-mat-sidenav-toggle></ga-mat-sidenav-toggle>
+        <h1>Groups</h1>
+    </mat-toolbar>
+</div>
+
+<mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="group-tree">
+    <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle class="leaf mat-tree-node">
+        <a mat-button [routerLink]="['/', instance.host, 'groups', node.group.id]">
+            {{ node.group.name }}
+        </a>
+    </mat-tree-node>
+    <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
+        <div class="node mat-tree-node">
+            <button mat-icon-button matTreeNodeToggle>
+                <mat-icon class="mat-icon-rtl-mirror">
+                    {{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+                </mat-icon>
+            </button>
+            <a mat-button [routerLink]="['/', instance.host, 'groups', node.group.id]">
+                {{ node.group.name }}
+            </a>
+        </div>
+        <div [class.invisible]="!treeControl.isExpanded(node)" class="children">
+            <ng-container matTreeNodeOutlet></ng-container>
+        </div>
+    </mat-nested-tree-node>
+</mat-tree>
