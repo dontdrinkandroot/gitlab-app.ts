@@ -108,7 +108,7 @@ class ProjectsApi {
             options.params = {membership: membership};
         }
 
-        return this.apiClient.httpPaginatedGetAllCached<Project>('/projects', options);
+        return this.apiClient.httpPaginatedGetAll<Project>('/projects', options);
     }
 
     public get = (projectId: number) => new ProjectApi(this.apiClient, projectId);

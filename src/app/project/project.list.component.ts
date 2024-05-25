@@ -8,15 +8,17 @@ import {MatListModule} from "@angular/material/list";
 import {AppendTokenPipe} from "../instance/append-token.pipe";
 import {ProjectAvatarUrlPipePipe} from "./project-avatar-url.pipe";
 import {RouterLink} from "@angular/router";
-import {map} from "rxjs/operators";
+import {map, switchMap} from "rxjs/operators";
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
 import {MatInputModule} from "@angular/material/input";
 import {MatFormFieldModule} from "@angular/material/form-field";
-import {combineLatest, startWith} from "rxjs";
+import {combineLatest, filter, startWith} from "rxjs";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {ProjectGenericAvatarDataPipe} from "./project-generic-avatar-data.pipe";
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
+import {CacheService} from "../cache/cache.service";
+import {isNonNull} from "../rxjs/extensions";
 
 @Component({
     standalone: true,
@@ -45,7 +47,20 @@ export class ProjectListComponent {
 
     public searchControl = new FormControl('', {nonNullable: true});
 
-    public projects$ = this.api.projects.list(true).pipe(
+    // public projects$ = this.api.projects.list(true).pipe(
+    //     map((projects) => projects.sort((a, b) => a.last_activity_at > b.last_activity_at ? -1 : 1))
+    // )
+
+    public projects$ = this.instance$.pipe(
+        filter(isNonNull),
+        switchMap((instance) =>
+            this.cacheService.cached(
+                instance.host + '_projects_with_membership',
+                () => this.api.projects.list(true),
+                undefined,
+                60
+            )
+        ),
         map((projects) => projects.sort((a, b) => a.last_activity_at > b.last_activity_at ? -1 : 1))
     )
 
@@ -63,7 +78,8 @@ export class ProjectListComponent {
 
     constructor(
         private readonly instanceService: InstanceService,
-        private readonly api: ApiService
+        private readonly api: ApiService,
+        private readonly cacheService: CacheService
     ) {
 
     }
