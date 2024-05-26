@@ -12,7 +12,7 @@ import {map, switchMap} from "rxjs/operators";
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
 import {MatInputModule} from "@angular/material/input";
 import {MatFormFieldModule} from "@angular/material/form-field";
-import {combineLatest, filter, startWith} from "rxjs";
+import {BehaviorSubject, combineLatest, filter, startWith} from "rxjs";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {ProjectGenericAvatarDataPipe} from "./project-generic-avatar-data.pipe";
 import {MatButtonModule} from "@angular/material/button";
@@ -45,11 +45,9 @@ export class ProjectListComponent {
 
     public instance$ = this.instanceService.watchCurrentInstance();
 
-    public searchControl = new FormControl('', {nonNullable: true});
+    private refresh$ = new BehaviorSubject<number | null>(null);
 
-    // public projects$ = this.api.projects.list(true).pipe(
-    //     map((projects) => projects.sort((a, b) => a.last_activity_at > b.last_activity_at ? -1 : 1))
-    // )
+    public searchControl = new FormControl('', {nonNullable: true});
 
     public projects$ = this.instance$.pipe(
         filter(isNonNull),
@@ -57,8 +55,8 @@ export class ProjectListComponent {
             this.cacheService.cached(
                 instance.host + '_projects_with_membership',
                 () => this.api.projects.list(true),
-                undefined,
-                60
+                60 * 5, // 5 minutes
+                this.refresh$,
             )
         ),
         map((projects) => projects.sort((a, b) => a.last_activity_at > b.last_activity_at ? -1 : 1))
@@ -82,5 +80,9 @@ export class ProjectListComponent {
         private readonly cacheService: CacheService
     ) {
 
+    }
+
+    public refresh() {
+        this.refresh$.next(Date.now());
     }
 }
