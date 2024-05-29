@@ -46,7 +46,7 @@ body.scrolled {
 
 .mat-toolbar {
 
-    .ga-mat-heading {
+    h1, .ga-mat-heading {
         overflow: hidden !important;
         text-overflow: ellipsis !important;
         white-space: nowrap !important;
@@ -54,10 +54,15 @@ body.scrolled {
     }
 
     ga-mat-sidenav-toggle {
-        margin-right: .5rem;
+        margin-right: .25rem;
         @media (min-width: $ga-breakpoint-md) {
             display: none;
         }
+    }
+
+    /* We always have a left icon */
+    &.mat-toolbar-row, &.mat-toolbar-single-row {
+        padding-left: .25rem;
     }
 }
 

@@ -2,12 +2,9 @@
     <mat-toolbar>
         <ga-mat-sidenav-toggle></ga-mat-sidenav-toggle>
         @if (project$|async; as project) {
-            <div>
-                @if (jobId$|async; as jobId) {
-                    <h1 class="mat-title-medium">{{ jobId }}</h1>
-                }
-                <h2 class="mat-body-medium">{{ project.namespace.name }} / {{ project.name }} / Jobs</h2>
-            </div>
+            @if (jobId$|async; as jobId) {
+                <h1>{{ jobId }}</h1>
+            }
         }
     </mat-toolbar>
 </div>

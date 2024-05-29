@@ -40,13 +40,15 @@
 
                     <mat-divider></mat-divider>
 
-                    <div matSubheader class="mat-title-small">{{ currentProject.name }}</div>
-
-                    <a mat-list-item [routerLink]="['/', currentInstance.host, 'projects', currentProject.id]"
+                    <a mat-list-item
+                       [routerLink]="['/', currentInstance.host, 'projects', currentProject.id]"
                        [routerLinkActive]="['mdc-list-item--activated']"
-                       [routerLinkActiveOptions]="{exact:true}">
-                        Project
+                       [routerLinkActiveOptions]="{exact:true}"
+                    >
+                        <div matListItemTitle>{{ currentProject.name }}</div>
+                        <div matListItemLine>{{ currentProject.namespace.full_path }}</div>
                     </a>
+
                     <a mat-list-item
                        [routerLink]="['/', currentInstance.host, 'projects', currentProject.id, 'issues']"
                        [routerLinkActive]="['mdc-list-item--activated']">
