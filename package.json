@@ -6,6 +6,7 @@
         "start": "ng serve",
         "build": "ng build",
         "watch": "ng build --watch --configuration development",
+        "serve": "ng serve --watch --configuration development",
         "test": "ng test",
         "icons-maskable": "icon-gen -i src/assets/icons/template-maskable.svg -o src/assets/icons/ --favicon --favicon-name=icon-maskable- --favicon-png-sizes 16,32,72,96,128,144,152,192,384,512 --favicon-ico-sizes 16,32",
         "icons-any": "icon-gen -i src/assets/icons/template-any.svg -o src/assets/icons/ --favicon --favicon-name=icon-any- --favicon-png-sizes 16,32,72,96,128,144,152,192,384,512 --favicon-ico-sizes 16,32"
