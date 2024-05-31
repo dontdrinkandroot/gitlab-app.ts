@@ -10,7 +10,7 @@ import {ProjectComponent} from "./project/project.component";
 import {projectResolver} from "./project/project-resolver.service";
 import {PipelineDetailComponent} from "./pipeline/pipeline.detail.component";
 import {GroupListComponent} from "./group/group.list.component";
-import {ProjectListComponent} from "./project/project.list.component";
+import {ProjectListCacheResolver, ProjectListComponent} from "./project/project.list.component";
 import {JobDetailComponent} from "./job/job.detail.component";
 import {IssueListComponent} from "./issue/issue.list.component";
 
@@ -44,7 +44,10 @@ export const routes: Routes = [
                 children: [
                     {
                         path: '',
-                        component: ProjectListComponent
+                        component: ProjectListComponent,
+                        resolve: {
+                            cachedProjects: ProjectListCacheResolver,
+                        }
                     },
                     {
                         path: ':projectId',

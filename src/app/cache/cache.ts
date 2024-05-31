@@ -5,6 +5,12 @@ export interface CacheEntry<T> {
     created: number;
 }
 
+export interface CacheResult<T> {
+    key: string;
+    created?: number;
+    value?: T;
+}
+
 export interface Cache {
     has(key: string): Promise<boolean>;
 
@@ -12,9 +18,11 @@ export interface Cache {
 
     getEntry<T>(key: string): Promise<CacheEntry<T> | null>;
 
-    set<T>(key: string, value: T): Promise<void>;
+    getResult<T>(key: string): Promise<CacheResult<T>>;
 
-    delete(key: string): Promise<void>;
+    set<T>(key: string, value: T): Promise<any>;
+
+    delete(key: string): Promise<any>;
 }
 
 const DB_NAME = 'CacheDB';
@@ -69,26 +77,22 @@ export class IndexDbCache implements Cache {
 
     async getEntry<T>(key: string): Promise<CacheEntry<T> | null> {
         const store = await this.getObjectStore('readonly');
-        return new Promise<CacheEntry<T> | null>((resolve, reject) => {
-            const request = store.get(key);
 
-            request.onsuccess = (event) => {
-                if (request.result) {
-                    const entry = request.result as CacheEntry<T>;
-                    entry.value = JSON.parse(entry.value as string);
-                    resolve(entry);
-                } else {
-                    resolve(null);
-                }
-            };
-
-            request.onerror = (event) => {
-                reject(`Error getting entry: ${request.error}`);
-            };
+        return this.promisifyRequest(store.get(key)).then((entry) => {
+            if (entry) {
+                entry.value = JSON.parse(entry.value as string);
+                return entry as CacheEntry<T>;
+            }
+            return null;
         });
     }
 
-    async set<T>(key: string, value: T): Promise<void> {
+    async getResult<T>(key: string): Promise<CacheResult<T>> {
+        const entry = await this.getEntry<T>(key);
+        return {key, value: entry?.value, created: entry?.created};
+    }
+
+    async set<T>(key: string, value: T): Promise<IDBValidKey> {
         const store = await this.getObjectStore('readwrite');
         const now = Date.now();
         const entry: CacheEntry<T> = {
@@ -98,37 +102,24 @@ export class IndexDbCache implements Cache {
             created: now
         };
 
-        return new Promise<void>((resolve, reject) => {
-            const request = store.put({...entry, key, value: JSON.stringify(value)});
-
-            request.onsuccess = (event) => {
-                resolve();
-            };
-
-            request.onerror = (event) => {
-                reject(`Error setting entry: ${request.error}`);
-            };
-        });
+        return this.promisifyRequest(store.put({...entry, key, value: JSON.stringify(value)}));
     }
 
-    async delete(key: string): Promise<void> {
+    async delete(key: string): Promise<undefined> {
         const store = await this.getObjectStore('readwrite');
-        return new Promise<void>((resolve, reject) => {
-            const request = store.delete(key);
-
-            request.onsuccess = (event) => {
-                resolve();
-            };
-
-            request.onerror = (event) => {
-                reject(`Error deleting entry: ${request.error}`);
-            };
-        });
+        return this.promisifyRequest(store.delete(key));
     }
 
-    private async updateLastUsed<T>(key: string, entry: CacheEntry<T>): Promise<void> {
+    private async updateLastUsed<T>(key: string, entry: CacheEntry<T>): Promise<IDBValidKey> {
         entry.lastUsed = Date.now();
         entry.timesUsed += 1;
         return this.set(key, entry.value);
+    }
+
+    private promisifyRequest<T>(request: IDBRequest<T>): Promise<T> {
+        return new Promise<T>((resolve, reject) => {
+            request.onsuccess = (event) => resolve(request.result);
+            request.onerror = (event) => reject(request.error);
+        });
     }
 }
