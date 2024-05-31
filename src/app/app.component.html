@@ -49,16 +49,21 @@
                         <div matListItemLine>{{ currentProject.namespace.full_path }}</div>
                     </a>
 
-                    <a mat-list-item
-                       [routerLink]="['/', currentInstance.host, 'projects', currentProject.id, 'issues']"
-                       [routerLinkActive]="['mdc-list-item--activated']">
-                        Issues
-                    </a>
-                    <a mat-list-item
-                       [routerLink]="['/', currentInstance.host, 'projects', currentProject.id, 'pipelines']"
-                       [routerLinkActive]="['mdc-list-item--activated']">
-                        Pipelines
-                    </a>
+                    @if (currentProject.issues_enabled) {
+                        <a mat-list-item
+                           [routerLink]="['/', currentInstance.host, 'projects', currentProject.id, 'issues']"
+                           [routerLinkActive]="['mdc-list-item--activated']">
+                            Issues
+                        </a>
+                    }
+
+                    @if (currentProject.jobs_enabled) {
+                        <a mat-list-item
+                           [routerLink]="['/', currentInstance.host, 'projects', currentProject.id, 'pipelines']"
+                           [routerLinkActive]="['mdc-list-item--activated']">
+                            Pipelines
+                        </a>
+                    }
                 }
             </mat-nav-list>
         }

@@ -11,4 +11,7 @@ export interface Project {
     namespace: Namespace,
     created_at: string,
     last_activity_at: string,
+    jobs_enabled: boolean,
+    wiki_enabled: boolean,
+    issues_enabled: boolean,
 }
