@@ -6,143 +6,129 @@ export interface CacheEntry<T> {
 }
 
 export interface Cache {
-    has(key: string): boolean;
+    has(key: string): Promise<boolean>;
 
-    get<T>(key: string): T | null;
+    get<T>(key: string): Promise<T | null>;
 
-    getEntry<T>(key: string): CacheEntry<T> | null;
+    getEntry<T>(key: string): Promise<CacheEntry<T> | null>;
 
-    set<T>(key: string, value: T): void;
+    set<T>(key: string, value: T): Promise<void>;
 
-    delete(key: string): void;
+    delete(key: string): Promise<void>;
 }
 
-export class InMemoryCache implements Cache {
-    private readonly cache: Map<string, CacheEntry<any>> = new Map();
+const DB_NAME = 'CacheDB';
+const DB_VERSION = 1;
 
-    /**
-     * @override
-     */
-    public has(key: string): boolean {
-        return this.cache.has(key);
+export class IndexDbCache implements Cache {
+    private db$ = this.initDB();
+
+    constructor(private readonly storeName: string = 'entries') {
     }
 
-    /**
-     * @override
-     */
-    public get<T>(key: string): T | null {
-        const entry = this.cache.get(key);
-        if (entry) {
-            entry.lastUsed = Date.now();
-            entry.timesUsed++;
-            return entry.value;
-        }
-        return null;
-    }
+    private async initDB(): Promise<IDBDatabase> {
+        return new Promise<IDBDatabase>((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-    /**
-     * @override
-     */
-    public getEntry<T>(key: string): CacheEntry<T> | null {
-        const entry = this.cache.get(key);
-        if (null != entry) {
-            entry.lastUsed = Date.now();
-            entry.timesUsed++;
-            return entry;
-        }
-        return null;
-    }
+            request.onerror = (event) => {
+                reject(`Error opening DB: ${request.error}`);
+            };
 
-    /**
-     * @override
-     */
-    public set<T>(key: string, value: T): void {
-        this.cache.set(key, {
-            value,
-            lastUsed: Date.now(),
-            timesUsed: 0,
-            created: Date.now()
+            request.onsuccess = (event) => {
+                resolve(request.result);
+            };
+
+            request.onupgradeneeded = (event) => {
+                const db = request.result;
+                if (!db.objectStoreNames.contains(this.storeName)) {
+                    db.createObjectStore(this.storeName, {keyPath: 'key'});
+                }
+            };
         });
     }
 
-    /**
-     * @override
-     */
-    public delete(key: string): void {
-        this.cache.delete(key);
-    }
-}
-
-export class LocalStorageCache implements Cache {
-
-    constructor(private prefix: string) {
+    private async getObjectStore(mode: IDBTransactionMode): Promise<IDBObjectStore> {
+        const db = await this.db$;
+        const transaction = db.transaction([this.storeName], mode);
+        return transaction.objectStore(this.storeName);
     }
 
-    /**
-     * @override
-     */
-    public has(key: string): boolean {
-        return localStorage.getItem(this.getPrefixedKey(key)) !== null;
+    async has(key: string): Promise<boolean> {
+        const entry = await this.getEntry<any>(key);
+        return entry !== null;
     }
 
-    /**
-     * @override
-     */
-    public get<T>(key: string): T | null {
-        const entry = this.getEntry<T>(key);
-        if (null != entry) {
+    async get<T>(key: string): Promise<T | null> {
+        const entry = await this.getEntry<T>(key);
+        if (entry) {
+            this.updateLastUsed(key, entry);
             return entry.value;
         }
         return null;
     }
 
-    /**
-     * @override
-     */
-    public getEntry<T>(key: string): CacheEntry<T> | null {
-        const entry = this.retrieveCacheEntry<T>(key);
-        if (null != entry) {
-            entry.lastUsed = Date.now();
-            entry.timesUsed++;
-            this.storeCacheEntry<T>(key, entry);
-            return entry;
-        }
-        return null;
+    async getEntry<T>(key: string): Promise<CacheEntry<T> | null> {
+        const store = await this.getObjectStore('readonly');
+        return new Promise<CacheEntry<T> | null>((resolve, reject) => {
+            const request = store.get(key);
+
+            request.onsuccess = (event) => {
+                if (request.result) {
+                    const entry = request.result as CacheEntry<T>;
+                    entry.value = JSON.parse(entry.value as string);
+                    resolve(entry);
+                } else {
+                    resolve(null);
+                }
+            };
+
+            request.onerror = (event) => {
+                reject(`Error getting entry: ${request.error}`);
+            };
+        });
     }
 
-    /**
-     * @override
-     */
-    public set<T>(key: string, value: T): void {
-        localStorage.setItem(this.getPrefixedKey(key), JSON.stringify({
+    async set<T>(key: string, value: T): Promise<void> {
+        const store = await this.getObjectStore('readwrite');
+        const now = Date.now();
+        const entry: CacheEntry<T> = {
             value,
-            lastUsed: Date.now(),
+            lastUsed: now,
             timesUsed: 0,
-            created: Date.now()
-        }));
+            created: now
+        };
+
+        return new Promise<void>((resolve, reject) => {
+            const request = store.put({...entry, key, value: JSON.stringify(value)});
+
+            request.onsuccess = (event) => {
+                resolve();
+            };
+
+            request.onerror = (event) => {
+                reject(`Error setting entry: ${request.error}`);
+            };
+        });
     }
 
-    /**
-     * @override
-     */
-    public delete(key: string): void {
-        localStorage.removeItem(this.getPrefixedKey(key));
+    async delete(key: string): Promise<void> {
+        const store = await this.getObjectStore('readwrite');
+        return new Promise<void>((resolve, reject) => {
+            const request = store.delete(key);
+
+            request.onsuccess = (event) => {
+                resolve();
+            };
+
+            request.onerror = (event) => {
+                reject(`Error deleting entry: ${request.error}`);
+            };
+        });
     }
 
-    private getPrefixedKey(key: string) {
-        return this.prefix + key;
-    }
-
-    private storeCacheEntry<T>(key: string, entry: CacheEntry<T>) {
-        localStorage.setItem(this.getPrefixedKey(key), JSON.stringify(entry));
-    }
-
-    private retrieveCacheEntry<T>(key: string): CacheEntry<T> | null {
-        const value = localStorage.getItem(this.getPrefixedKey(key));
-        if (null != value) {
-            return JSON.parse(value);
-        }
-        return null;
+    private async updateLastUsed<T>(key: string, entry: CacheEntry<T>): Promise<void> {
+        entry.lastUsed = Date.now();
+        entry.timesUsed += 1;
+        return this.set(key, entry.value);
     }
 }
-

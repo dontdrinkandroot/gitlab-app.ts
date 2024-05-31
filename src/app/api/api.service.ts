@@ -4,25 +4,25 @@ import {Observable} from "rxjs";
 import {Project} from "../project/project";
 import {Pipeline} from "../pipeline/pipeline";
 import {Job} from "../job/job";
-import {ApiClientService, HttpGetOptions, HttpGetPaginatedOptionsCached} from "./api-client.service";
+import {ApiClientService, HttpGetOptions, HttpGetPaginatedOptions} from "./api-client.service";
 import {Issue} from "./model";
 
 class GroupApi {
     constructor(private readonly apiClient: ApiClientService, private readonly groupId: number) {
     }
 
-    public fetch = (): Observable<Group> => this.apiClient.httpGetCached<Group>(`/groups/${this.groupId}`);
+    public fetch = (): Observable<Group> => this.apiClient.httpGet<Group>(`/groups/${this.groupId}`);
 
-    public subgroups = (): Observable<Group[]> => this.apiClient.httpPaginatedGetAllCached<Group>(`/groups/${this.groupId}/subgroups`);
+    public subgroups = (): Observable<Group[]> => this.apiClient.httpPaginatedGetAll<Group>(`/groups/${this.groupId}/subgroups`);
 
-    public projects = (): Observable<Project[]> => this.apiClient.httpPaginatedGetAllCached<Project>(`/groups/${this.groupId}/projects`);
+    public projects = (): Observable<Project[]> => this.apiClient.httpPaginatedGetAll<Project>(`/groups/${this.groupId}/projects`);
 }
 
 class GroupsApi {
     constructor(private readonly apiClient: ApiClientService) {
     }
 
-    public list = (): Observable<Group[]> => this.apiClient.httpPaginatedGetAllCached<Group>('/groups');
+    public list = (): Observable<Group[]> => this.apiClient.httpPaginatedGetAll<Group>('/groups');
 
     public get = (groupId: number) => new GroupApi(this.apiClient, groupId);
 }
@@ -31,7 +31,7 @@ class ProjectApi {
     constructor(private readonly apiClient: ApiClientService, private readonly projectId: number) {
     }
 
-    public fetch = (): Observable<Project> => this.apiClient.httpGetCached<Project>(`/projects/${this.projectId}`);
+    public fetch = (): Observable<Project> => this.apiClient.httpGet<Project>(`/projects/${this.projectId}`);
 
     public pipelines = () => new ProjectPipelinesApi(this.apiClient, this.projectId);
 
@@ -47,14 +47,14 @@ class ProjectIssuesApi {
     }
 
     public list = (limit: number | null = 100): Observable<Issue[]> => {
-        let options: HttpGetPaginatedOptionsCached = {};
+        let options: HttpGetPaginatedOptions = {};
 
         if (limit) {
             options.perPage = limit;
             options.maxPages = 1;
         }
 
-        return this.apiClient.httpPaginatedGetAllCached<Issue>(`/projects/${this.projectId}/issues`, options);
+        return this.apiClient.httpPaginatedGetAll<Issue>(`/projects/${this.projectId}/issues`, options);
     }
 }
 
@@ -63,14 +63,14 @@ class ProjectPipelinesApi {
     }
 
     public list = (limit: number | null = 100): Observable<Pipeline[]> => {
-        let options: HttpGetPaginatedOptionsCached = {};
+        let options: HttpGetPaginatedOptions = {};
 
         if (limit) {
             options.perPage = limit;
             options.maxPages = 1;
         }
 
-        return this.apiClient.httpPaginatedGetAllCached<Pipeline>(`/projects/${this.projectId}/pipelines`, options);
+        return this.apiClient.httpPaginatedGetAll<Pipeline>(`/projects/${this.projectId}/pipelines`, options);
     }
 
     public get = (pipelineId: number) => new ProjectPipelineApi(this.apiClient, this.projectId, pipelineId);
@@ -80,16 +80,16 @@ class ProjectPipelineApi {
     constructor(private readonly apiClient: ApiClientService, private readonly projectId: number, private readonly pipelineId: number) {
     }
 
-    public fetch = (): Observable<Pipeline> => this.apiClient.httpGetCached<Pipeline>(`/projects/${this.projectId}/pipelines/${this.pipelineId}`);
+    public fetch = (): Observable<Pipeline> => this.apiClient.httpGet<Pipeline>(`/projects/${this.projectId}/pipelines/${this.pipelineId}`);
 
-    public jobs = () => this.apiClient.httpPaginatedGetAllCached<Job>(`/projects/${this.projectId}/pipelines/${this.pipelineId}/jobs`);
+    public jobs = () => this.apiClient.httpPaginatedGetAll<Job>(`/projects/${this.projectId}/pipelines/${this.pipelineId}/jobs`);
 }
 
 class ProjectJobApi {
     constructor(private readonly apiClient: ApiClientService, private readonly projectId: number, private readonly jobId: number) {
     }
 
-    public fetch = (): Observable<Job> => this.apiClient.httpGetCached<Job>(`/projects/${this.projectId}/jobs/${this.jobId}`);
+    public fetch = (): Observable<Job> => this.apiClient.httpGet<Job>(`/projects/${this.projectId}/jobs/${this.jobId}`);
 
     public play = () => this.apiClient.httpPost(`/projects/${this.projectId}/jobs/${this.jobId}/play`, {});
 
