@@ -15,7 +15,7 @@ import {StateColorClassPipe} from "./state-color-class.pipe";
 import {Job} from "../job/job";
 import {MatButtonModule} from "@angular/material/button";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
-import {InstanceService} from "../instance/instance.service";
+import {InstanceContext} from "../instance/instance-context.service";
 
 @Component({
     standalone: true,
@@ -36,7 +36,7 @@ import {InstanceService} from "../instance/instance.service";
 })
 export class PipelineDetailComponent {
 
-    public instance$ = this.instanceService.watchCurrentInstance().pipe(filter(isNonNull))
+    public instance$ = this.instanceContext.watchInstance().pipe(filter(isNonNull))
 
     public project$;
 
@@ -48,7 +48,7 @@ export class PipelineDetailComponent {
         route: ActivatedRoute,
         projectService: ProjectService,
         private readonly api: ApiService,
-        private readonly instanceService: InstanceService
+        private readonly instanceContext: InstanceContext
     ) {
         this.pipelineId$ = route.params.pipe(map(params => +params['pipelineId']));
         this.project$ = projectService.watchCurrentProject().pipe(filter(isNonNull));

@@ -1,19 +1,19 @@
 import {Pipe, PipeTransform} from "@angular/core";
-import {InstanceService} from "./instance.service";
+import {InstanceContext} from "./instance-context.service";
 
 @Pipe({
     name: 'gaAppendToken',
     standalone: true
 })
 export class AppendTokenPipe implements PipeTransform {
-    constructor(private instanceService: InstanceService) {
+    constructor(private instanceContext: InstanceContext) {
     }
 
     /**
      * @override
      */
     public transform(url: string): string {
-        const token = this.instanceService.getCurrentInstance()?.token;
+        const token = this.instanceContext.getInstance()?.token;
         if (!token) {
             return url;
         }

@@ -6,13 +6,13 @@ import {isNonNull} from "../rxjs/extensions";
 import {AsyncPipe, DatePipe, NgClass} from "@angular/common";
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {SidenavToggleComponent} from "../sidenav/sidenav-toggle.component";
-import {InstanceService} from "../instance/instance.service";
 import {MatListModule} from "@angular/material/list";
 import {MatIconModule} from "@angular/material/icon";
 import {RouterLink} from "@angular/router";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {StateColorClassPipe} from "./state-color-class.pipe";
 import {StateIconPipe} from "./state-icon.pipe";
+import {InstanceContext} from "../instance/instance-context.service";
 
 @Component({
     standalone: true,
@@ -33,7 +33,7 @@ import {StateIconPipe} from "./state-icon.pipe";
 })
 export class PipelineListComponent {
 
-    public instance$ = this.instanceService.watchCurrentInstance();
+    public instance$ = this.instanceContext.watchInstance();
 
     public project$ = this.projectService.watchCurrentProject();
 
@@ -47,7 +47,7 @@ export class PipelineListComponent {
     constructor(
         private readonly projectService: ProjectService,
         private readonly api: ApiService,
-        private readonly instanceService: InstanceService
+        private readonly instanceContext: InstanceContext
     ) {
     }
 }

@@ -3,20 +3,42 @@ import {InstanceConfig} from "./instance-config";
 import {BehaviorSubject, lastValueFrom} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {User} from "../user/user";
-import {Router} from "@angular/router";
+import {NavigationStart, Router} from "@angular/router";
+import {InstanceContext} from "./instance-context.service";
 
 @Injectable({providedIn: 'root'})
 export class InstanceService {
 
     private instances$ = new BehaviorSubject<InstanceConfig[]>([]);
 
-    private currentInstance$ = new BehaviorSubject<InstanceConfig | null>(null);
-
     constructor(
         private readonly httpClient: HttpClient,
+        private readonly instanceContext: InstanceContext,
         private readonly router: Router
     ) {
         this.instances$.next(JSON.parse(localStorage.getItem('instances') || '[]'));
+
+    }
+
+    public registerRouteListener() {
+        this.router.events.subscribe(event => {
+            if (event instanceof NavigationStart) {
+
+                const host = event.url.match(/^\/([\w\\.]+)/)?.[1];
+                if (null == host) {
+                    this.instanceContext.setInstance(null);
+                    return;
+                }
+
+                const instance = this.instances$.value.find(i => i.host === host);
+                if (null == instance) {
+                    this.router.navigate(['/']);
+                    return;
+                }
+
+                this.instanceContext.setInstance(instance);
+            }
+        });
     }
 
     public async validateAndAdd(host: string, token: string): Promise<InstanceConfig> {
@@ -52,25 +74,25 @@ export class InstanceService {
         return this.instances$.asObservable();
     }
 
-    public watchCurrentInstance() {
-        return this.currentInstance$.asObservable();
-    }
-
-    public getCurrentInstance() {
-        return this.currentInstance$.value;
-    }
-
-    public fetchCurrentInstance() {
-        const instance = this.currentInstance$.value;
-        if (null === instance) {
-            throw new Error('No instance selected');
-        }
-
-        return instance;
-    }
-
-    public setCurrentInstanceByHost(host: string) {
-        const instance = this.instances$.value.find(i => i.host === host) || null;
-        this.currentInstance$.next(instance);
-    }
+    // public watchCurrentInstance() {
+    //     return this.currentInstance$.asObservable();
+    // }
+    //
+    // public getCurrentInstance() {
+    //     return this.currentInstance$.value;
+    // }
+    //
+    // public fetchCurrentInstance() {
+    //     const instance = this.currentInstance$.value;
+    //     if (null === instance) {
+    //         throw new Error('No instance selected');
+    //     }
+    //
+    //     return instance;
+    // }
+    //
+    // public setCurrentInstanceByHost(host: string) {
+    //     const instance = this.instances$.value.find(i => i.host === host) || null;
+    //     this.currentInstance$.next(instance);
+    // }
 }

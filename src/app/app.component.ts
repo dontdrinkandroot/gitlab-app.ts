@@ -1,5 +1,5 @@
 import {Component, Inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {NavigationEnd, NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet,} from '@angular/router';
+import {NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet,} from '@angular/router';
 import {MatDrawerMode, MatSidenav, MatSidenavContent, MatSidenavModule} from "@angular/material/sidenav";
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {NgProgressModule} from "ngx-progressbar";
@@ -7,13 +7,13 @@ import {AsyncPipe, DOCUMENT, NgClass} from "@angular/common";
 import {distinctUntilChanged, filter, fromEvent, Observable, Subscription} from "rxjs";
 import {SidenavService} from "./sidenav/sidenav.service";
 import {MatListModule} from "@angular/material/list";
-import {InstanceService} from "./instance/instance.service";
 import {MatCardModule} from "@angular/material/card";
 import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
 import {SwUpdate} from "@angular/service-worker";
 import {ProjectService} from "./project/project.service";
 import {map} from "rxjs/operators";
+import {InstanceContext} from "./instance/instance-context.service";
 
 @Component({
     selector: 'app-root',
@@ -53,21 +53,13 @@ export class AppComponent implements OnInit, OnDestroy {
 
     constructor(
         private readonly sidenavService: SidenavService,
-        private readonly instanceService: InstanceService,
+        private readonly instanceContext: InstanceContext,
         private readonly router: Router,
         private readonly projectService: ProjectService,
         @Inject(DOCUMENT) private readonly document: Document,
         swUpdate: SwUpdate,
     ) {
-        this.currentInstance$ = this.instanceService.watchCurrentInstance();
-
-        // TODO: This should certainly be handled somewhere else
-        this.router.events.subscribe(event => {
-            if (event instanceof NavigationStart) {
-                const host = event.url.split('/')[1];
-                this.instanceService.setCurrentInstanceByHost(host);
-            }
-        });
+        this.currentInstance$ = this.instanceContext.watchInstance();
 
         if (swUpdate.isEnabled) {
             swUpdate.versionUpdates.subscribe((event) => {

@@ -11,10 +11,10 @@ import {MatTreeModule, MatTreeNestedDataSource} from "@angular/material/tree";
 import {NestedTreeControl} from "@angular/cdk/tree";
 import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
-import {InstanceService} from "../instance/instance.service";
 import {InstanceConfig} from "../instance/instance-config";
 import {GroupTreeNode} from "./group-tree-node";
 import {Group} from "./group";
+import {InstanceContext} from "../instance/instance-context.service";
 
 @Component({
     standalone: true,
@@ -34,12 +34,12 @@ export class GroupListComponent implements OnDestroy {
 
     constructor(
         private readonly apiService: ApiService,
-        private readonly instanceService: InstanceService
+        private readonly instanceContext: InstanceContext
     ) {
         this.dataSubscription = this.apiService.groups.list().subscribe({
             next: groups => this.dataSource.data = this.buildGroupTree(groups)
         })
-        this.instance = this.instanceService.getCurrentInstance()!;
+        this.instance = this.instanceContext.fetchInstance()!;
     }
 
     /**

@@ -1,4 +1,4 @@
-import {ApplicationConfig, importProvidersFrom, isDevMode} from '@angular/core';
+import {ApplicationConfig, ENVIRONMENT_INITIALIZER, importProvidersFrom, inject, isDevMode} from '@angular/core';
 import {provideRouter, withInMemoryScrolling} from '@angular/router';
 
 import {routes} from './app.routes';
@@ -8,6 +8,7 @@ import {provideHttpClient, withInterceptorsFromDi} from "@angular/common/http";
 import {NgProgressHttpModule} from "ngx-progressbar/http";
 import {provideServiceWorker} from '@angular/service-worker';
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from "@angular/material/form-field";
+import {InstanceService} from "./instance/instance.service";
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -27,6 +28,13 @@ export const appConfig: ApplicationConfig = {
             provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
             useValue: {
                 subscriptSizing: 'dynamic'
+            }
+        },
+        {
+            provide: ENVIRONMENT_INITIALIZER,
+            multi: true,
+            useValue() {
+                inject(InstanceService).registerRouteListener()
             }
         },
         provideServiceWorker('ngsw-worker.js', {

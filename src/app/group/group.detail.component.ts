@@ -10,12 +10,12 @@ import {MatListModule} from "@angular/material/list";
 import {Observable} from "rxjs";
 import {Group} from "./group";
 import {Project} from "../project/project";
-import {InstanceService} from "../instance/instance.service";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {InstanceConfig} from "../instance/instance-config";
 import {AppendTokenPipe} from "../instance/append-token.pipe";
 import {ProjectAvatarUrlPipePipe} from "../project/project-avatar-url.pipe";
 import {GroupAvatarUrlPipe} from "./group-avatar-url.pipe";
+import {InstanceContext} from "../instance/instance-context.service";
 
 @Component({
     standalone: true,
@@ -47,9 +47,9 @@ export class GroupDetailComponent {
     constructor(
         private readonly api: ApiService,
         private readonly route: ActivatedRoute,
-        private readonly instanceService: InstanceService
+        private readonly instanceContext: InstanceContext
     ) {
-        this.instance = this.instanceService.fetchCurrentInstance();
+        this.instance = this.instanceContext.fetchInstance();
         const id$ = this.route.params.pipe(map(params => +params['id']));
         this.group$ = id$.pipe(switchMap(id => this.api.groups.get(id).fetch()));
         this.subgroups$ = id$.pipe(switchMap(id => this.api.groups.get(id).subgroups()));

@@ -2,7 +2,6 @@ import {Component} from "@angular/core";
 import {AsyncPipe, NgOptimizedImage} from "@angular/common";
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {SidenavToggleComponent} from "../sidenav/sidenav-toggle.component";
-import {InstanceService} from "../instance/instance.service";
 import {ApiService} from "../api/api.service";
 import {MatListModule} from "@angular/material/list";
 import {AppendTokenPipe} from "../instance/append-token.pipe";
@@ -19,6 +18,7 @@ import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {CacheService} from "../cache/cache.service";
 import {isNonNull} from "../rxjs/extensions";
+import {InstanceContext} from "../instance/instance-context.service";
 
 @Component({
     standalone: true,
@@ -43,7 +43,7 @@ import {isNonNull} from "../rxjs/extensions";
 })
 export class ProjectListComponent {
 
-    public instance$ = this.instanceService.watchCurrentInstance();
+    public instance$ = this.instanceContext.watchInstance();
 
     private refresh$ = new BehaviorSubject<number | null>(null);
 
@@ -75,7 +75,7 @@ export class ProjectListComponent {
         )
 
     constructor(
-        private readonly instanceService: InstanceService,
+        private readonly instanceContext: InstanceContext,
         private readonly api: ApiService,
         private readonly cacheService: CacheService
     ) {
