@@ -62,7 +62,9 @@ body.scrolled {
 
     /* We always have a left icon */
     &.mat-toolbar-row, &.mat-toolbar-single-row {
-        padding-left: .25rem;
+        @media (max-width: $ga-breakpoint-md) {
+            padding-left: .25rem;
+        }
     }
 }
 
