@@ -6,27 +6,65 @@
         </mat-toolbar>
     </div>
 
-    <div class="ga-content-container">
-        @if (issues$|async; as issues) {
-            @if (issues.length > 0) {
-                <mat-nav-list>
-                    @for (issue of issues; track issue.id) {
-                        <a mat-list-item
-                           [routerLink]="['/', project.instance.host, 'projects', issue.project_id, 'issues', issue.id]">
-                            <!--                        <mat-icon matListItemIcon [ngClass]="issue.status|gaStateColorClass">-->
-                            <!--                            {{ issue.status|gaStateIcon }}-->
-                            <!--                        </mat-icon>-->
-                            <!--                        <span matListItemTitle>{{ issue.ref }}</span>-->
-                            <!--                        <span matListItemLine>{{ issue.created_at | date: 'short' }}</span>-->
-                            {{ issue.id }}
-                        </a>
+    <mat-tab-group>
+
+        <mat-tab label="Open">
+            <ng-template matTabContent>
+                <div class="ga-content-container">
+                    @if (openIssues$|async; as issues) {
+                        @if (issues.length > 0) {
+                            <mat-nav-list>
+                                @for (issue of issues; track issue.id) {
+                                    <a mat-list-item
+                                       [routerLink]="['/', project.instance.host, 'projects', issue.project_id, 'issues', issue.id]">
+                                        <!--                        <mat-icon matListItemIcon [ngClass]="issue.status|gaStateColorClass">-->
+                                        <!--                            {{ issue.status|gaStateIcon }}-->
+                                        <!--                        </mat-icon>-->
+                                        <!--                        <span matListItemTitle>{{ issue.ref }}</span>-->
+                                        <!--                        <span matListItemLine>{{ issue.created_at | date: 'short' }}</span>-->
+                                        <span matListItemTitle>{{ issue.title }}</span>
+                                        <span matListItemLine>#{{ issue.iid }}</span>
+                                    </a>
+                                }
+                            </mat-nav-list>
+                        }
+                    } @else {
+                        <div class="d-flex justify-content-center my-half">
+                            <mat-progress-spinner [mode]="'indeterminate'" [diameter]="24"></mat-progress-spinner>
+                        </div>
                     }
-                </mat-nav-list>
-            }
-        } @else {
-            <div class="d-flex justify-content-center my-half">
-                <mat-progress-spinner [mode]="'indeterminate'" [diameter]="24"></mat-progress-spinner>
-            </div>
-        }
-    </div>
+                </div>
+            </ng-template>
+        </mat-tab>
+
+        <mat-tab label="Closed">
+            <ng-template matTabContent>
+                <div class="ga-content-container">
+                    @if (closedIssues$|async; as issues) {
+                        @if (issues.length > 0) {
+                            <mat-nav-list>
+                                @for (issue of issues; track issue.id) {
+                                    <a mat-list-item
+                                       [routerLink]="['/', project.instance.host, 'projects', issue.project_id, 'issues', issue.id]">
+                                        <!--                        <mat-icon matListItemIcon [ngClass]="issue.status|gaStateColorClass">-->
+                                        <!--                            {{ issue.status|gaStateIcon }}-->
+                                        <!--                        </mat-icon>-->
+                                        <!--                        <span matListItemTitle>{{ issue.ref }}</span>-->
+                                        <!--                        <span matListItemLine>{{ issue.created_at | date: 'short' }}</span>-->
+                                        <span matListItemTitle>{{ issue.title }}</span>
+                                        <span matListItemLine>#{{ issue.iid }}</span>
+                                    </a>
+                                }
+                            </mat-nav-list>
+                        }
+                    } @else {
+                        <div class="d-flex justify-content-center my-half">
+                            <mat-progress-spinner [mode]="'indeterminate'" [diameter]="24"></mat-progress-spinner>
+                        </div>
+                    }
+                </div>
+            </ng-template>
+        </mat-tab>
+
+    </mat-tab-group>
 }

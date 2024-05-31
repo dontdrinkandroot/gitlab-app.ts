@@ -62,7 +62,7 @@ class ProjectIssuesApi {
     ) {
     }
 
-    public list = (limit: number | null = 100): Observable<Issue[]> => {
+    public list = (limit: number | null = null): Observable<Issue[]> => {
         let options: HttpGetPaginatedOptions = {};
 
         if (limit) {
@@ -71,6 +71,28 @@ class ProjectIssuesApi {
         }
 
         return this.apiClient.httpPaginatedGetAll<Issue>(this.instance, `/projects/${this.projectId}/issues`, options);
+    }
+
+    public listOpen = (limit: number | null = null): Observable<Issue[]> => {
+        let options: HttpGetPaginatedOptions = {};
+
+        if (limit) {
+            options.perPage = limit;
+            options.maxPages = 1;
+        }
+
+        return this.apiClient.httpPaginatedGetAll<Issue>(this.instance, `/projects/${this.projectId}/issues?state=opened`, options);
+    }
+
+    public listClosed = (limit: number | null = null): Observable<Issue[]> => {
+        let options: HttpGetPaginatedOptions = {};
+
+        if (limit) {
+            options.perPage = limit;
+            options.maxPages = 1;
+        }
+
+        return this.apiClient.httpPaginatedGetAll<Issue>(this.instance, `/projects/${this.projectId}/issues?state=closed`, options);
     }
 }
 

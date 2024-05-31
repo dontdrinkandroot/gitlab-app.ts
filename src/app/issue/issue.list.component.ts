@@ -10,6 +10,8 @@ import {MatIconModule} from "@angular/material/icon";
 import {RouterLink} from "@angular/router";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {ProjectContext} from "../project/project-context.service";
+import {MatChipsModule} from "@angular/material/chips";
+import {MatTabsModule} from "@angular/material/tabs";
 
 @Component({
     standalone: true,
@@ -23,6 +25,8 @@ import {ProjectContext} from "../project/project-context.service";
         RouterLink,
         DatePipe,
         NgClass,
+        MatChipsModule,
+        MatTabsModule
     ],
     templateUrl: './issue.list.component.html'
 })
@@ -30,9 +34,12 @@ export class IssueListComponent {
 
     public project$ = this.projectContext.watchProject().pipe(filter(isNonNull));
 
-    public issues$ = this.project$.pipe(
-        filter(isNonNull),
-        switchMap(project => this.api.instance(project.instance).projects.get(project.id).issues().list(100)),
+    public openIssues$ = this.project$.pipe(
+        switchMap(project => this.api.instance(project.instance).projects.get(project.id).issues().listOpen()),
+    );
+
+    public closedIssues$ = this.project$.pipe(
+        switchMap(project => this.api.instance(project.instance).projects.get(project.id).issues().listClosed()),
     );
 
     constructor(
