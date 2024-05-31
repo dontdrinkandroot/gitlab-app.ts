@@ -145,3 +145,4 @@ export class LocalStorageCache implements Cache {
         return null;
     }
 }
+

@@ -38,6 +38,8 @@ class ProjectApi {
     public jobs = () => ({
         get: (jobId: number) => new ProjectJobApi(this.apiClient, this.projectId, jobId),
     });
+
+    public issues = () => new ProjectIssuesApi(this.apiClient, this.projectId);
 }
 
 class ProjectIssuesApi {

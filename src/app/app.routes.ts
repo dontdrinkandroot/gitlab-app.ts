@@ -12,6 +12,7 @@ import {PipelineDetailComponent} from "./pipeline/pipeline.detail.component";
 import {GroupListComponent} from "./group/group.list.component";
 import {ProjectListComponent} from "./project/project.list.component";
 import {JobDetailComponent} from "./job/job.detail.component";
+import {IssueListComponent} from "./issue/issue.list.component";
 
 export const routes: Routes = [
     {
@@ -67,6 +68,15 @@ export const routes: Routes = [
                                         path: ':pipelineId',
                                         component: PipelineDetailComponent,
                                     }
+                                ]
+                            },
+                            {
+                                path: 'issues',
+                                children: [
+                                    {
+                                        path: '',
+                                        component: IssueListComponent,
+                                    },
                                 ]
                             },
                             {

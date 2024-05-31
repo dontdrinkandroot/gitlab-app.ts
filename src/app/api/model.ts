@@ -1,5 +1,6 @@
 export interface Issue {
     id: number;
+    project_id: number;
     milestone: Milestone;
     author: Author;
     description: string;

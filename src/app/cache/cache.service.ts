@@ -30,7 +30,7 @@ export class CacheService {
             switchMap(([refresh, needsFetch]) => (refresh !== null || needsFetch) ? fetchAndCache$ : EMPTY)
         );
 
-        return initialValue
+        return (null != initialValue)
             ? fetchAndCacheIfNeeded$.pipe(startWith(initialValue))
             : fetchAndCacheIfNeeded$;
     }
