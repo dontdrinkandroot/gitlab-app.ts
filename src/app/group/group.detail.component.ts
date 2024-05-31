@@ -7,15 +7,15 @@ import {map, switchMap} from "rxjs/operators";
 import {AsyncPipe, NgOptimizedImage} from "@angular/common";
 import {MatCardModule} from "@angular/material/card";
 import {MatListModule} from "@angular/material/list";
-import {Observable} from "rxjs";
+import {combineLatest, filter, Observable} from "rxjs";
 import {Group} from "./group";
 import {Project} from "../project/project";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
-import {InstanceConfig} from "../instance/instance-config";
 import {AppendTokenPipe} from "../instance/append-token.pipe";
 import {ProjectAvatarUrlPipePipe} from "../project/project-avatar-url.pipe";
 import {GroupAvatarUrlPipe} from "./group-avatar-url.pipe";
 import {InstanceContext} from "../instance/instance-context.service";
+import {isNonNull} from "../rxjs/extensions";
 
 @Component({
     standalone: true,
@@ -36,29 +36,28 @@ import {InstanceContext} from "../instance/instance-context.service";
 })
 export class GroupDetailComponent {
 
+    public instance$ = this.instanceContext.watchInstance().pipe(filter(isNonNull));
+
     public group$: Observable<Group>;
 
     public subgroups$: Observable<Group[]>
 
     public projects$: Observable<Project[]>;
 
-    public instance: InstanceConfig;
-
     constructor(
         private readonly api: ApiService,
         private readonly route: ActivatedRoute,
         private readonly instanceContext: InstanceContext
     ) {
-        this.instance = this.instanceContext.fetchInstance();
-        const id$ = this.route.params.pipe(map(params => +params['id']));
-        this.group$ = id$.pipe(switchMap(id => this.api.groups.get(id).fetch()));
-        this.subgroups$ = id$.pipe(switchMap(id => this.api.groups.get(id).subgroups()));
-        this.projects$ = id$.pipe(switchMap(id => this.api.groups.get(id).projects()));
-    }
 
-    public getProjectAvatar(id: number): string {
-        const avatar = `https://${this.instance.host}/api/v4/projects/${id}/avatar`;
-        console.log({avatar})
-        return avatar
+        const id$ = this.route.params.pipe(map(params => +params['id']));
+
+        const groupApi$ = combineLatest([this.instance$, id$]).pipe(
+            map(([instance, id]) => this.api.instance(instance).groups.get(id))
+        );
+
+        this.group$ = groupApi$.pipe(switchMap(api => api.fetch()));
+        this.subgroups$ = groupApi$.pipe(switchMap(api => api.subgroups()));
+        this.projects$ = groupApi$.pipe(switchMap(api => api.projects()));
     }
 }

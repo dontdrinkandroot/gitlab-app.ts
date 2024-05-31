@@ -6,15 +6,15 @@ import {MatListModule} from "@angular/material/list";
 import {AsyncPipe} from "@angular/common";
 import {SidenavToggleComponent} from "../sidenav/sidenav-toggle.component";
 import {RouterLink} from "@angular/router";
-import {Subscription} from "rxjs";
+import {filter, Subscription, switchMap} from "rxjs";
 import {MatTreeModule, MatTreeNestedDataSource} from "@angular/material/tree";
 import {NestedTreeControl} from "@angular/cdk/tree";
 import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
-import {InstanceConfig} from "../instance/instance-config";
 import {GroupTreeNode} from "./group-tree-node";
 import {Group} from "./group";
 import {InstanceContext} from "../instance/instance-context.service";
+import {isNonNull} from "../rxjs/extensions";
 
 @Component({
     standalone: true,
@@ -24,7 +24,7 @@ import {InstanceContext} from "../instance/instance-context.service";
 })
 export class GroupListComponent implements OnDestroy {
 
-    public instance: InstanceConfig;
+    public instance$ = this.instanceContext.watchInstance().pipe(filter(isNonNull));
 
     public treeControl = new NestedTreeControl<GroupTreeNode>(node => node.children);
 
@@ -33,13 +33,14 @@ export class GroupListComponent implements OnDestroy {
     private dataSubscription: Subscription;
 
     constructor(
-        private readonly apiService: ApiService,
+        private readonly api: ApiService,
         private readonly instanceContext: InstanceContext
     ) {
-        this.dataSubscription = this.apiService.groups.list().subscribe({
-            next: groups => this.dataSource.data = this.buildGroupTree(groups)
-        })
-        this.instance = this.instanceContext.fetchInstance()!;
+        this.dataSubscription = this.instance$
+            .pipe(switchMap(instance => this.api.instance(instance).groups.list()))
+            .subscribe({
+                next: groups => this.dataSource.data = this.buildGroupTree(groups)
+            })
     }
 
     /**

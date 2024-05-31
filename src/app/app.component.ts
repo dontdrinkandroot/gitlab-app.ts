@@ -11,9 +11,9 @@ import {MatCardModule} from "@angular/material/card";
 import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
 import {SwUpdate} from "@angular/service-worker";
-import {ProjectService} from "./project/project.service";
 import {map} from "rxjs/operators";
 import {InstanceContext} from "./instance/instance-context.service";
+import {ProjectContext} from "./project/project-context.service";
 
 @Component({
     selector: 'app-root',
@@ -43,7 +43,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     public currentInstance$;
 
-    public currentProject$ = this.projectService.watchCurrentProject();
+    public currentProject$ = this.projectContext.watchProject();
 
     public sidenavOpened$: Observable<boolean> = this.sidenavService.getOpenedObservable();
 
@@ -54,8 +54,8 @@ export class AppComponent implements OnInit, OnDestroy {
     constructor(
         private readonly sidenavService: SidenavService,
         private readonly instanceContext: InstanceContext,
+        private readonly projectContext: ProjectContext,
         private readonly router: Router,
-        private readonly projectService: ProjectService,
         @Inject(DOCUMENT) private readonly document: Document,
         swUpdate: SwUpdate,
     ) {

@@ -1,15 +1,29 @@
 import {ResolveFn} from "@angular/router";
-import {Project} from "./project";
-import {tap} from "rxjs";
+import {combineLatest, filter, switchMap, tap} from "rxjs";
 import {ApiService} from "../api/api.service";
 import {inject} from "@angular/core";
-import {ProjectService} from "./project.service";
+import {InstanceContext} from "../instance/instance-context.service";
+import {ProjectContext, ProjectWithInstance} from "./project-context.service";
+import {isNonNull} from "../rxjs/extensions";
+import {map} from "rxjs/operators";
 
-export const projectResolver: ResolveFn<Project> = (route, state) => {
-    const projectService = inject(ProjectService);
+export const projectResolver: ResolveFn<ProjectWithInstance> = (route, state) => {
+    const instanceContext = inject(InstanceContext);
+    const projectContext = inject(ProjectContext);
     const api = inject(ApiService);
     const projectId = +route.params['projectId'];
-    return api.projects.get(projectId).fetch().pipe(
-        tap(project => projectService.setCurrentProject(project))
+
+    const instance$ = instanceContext.watchInstance().pipe(filter(isNonNull));
+    const project$ = instance$.pipe(
+        switchMap(instance => {
+            return api.instance(instance).projects.get(projectId).fetch();
+        }),
+    );
+
+    return combineLatest([instance$, project$]).pipe(
+        tap(([instance, project]) => {
+            projectContext.setProject(instance, project);
+        }),
+        map(([instance, project]) => ({...project, instance}))
     );
 }

@@ -1,57 +1,58 @@
-<div class="ga-mat-fixed-toolbar-container">
-    <mat-toolbar>
-        <ga-mat-sidenav-toggle></ga-mat-sidenav-toggle>
-        @if (project$|async; as project) {
+@if (project$|async; as project) {
+    <div class="ga-mat-fixed-toolbar-container">
+        <mat-toolbar>
+            <ga-mat-sidenav-toggle></ga-mat-sidenav-toggle>
+
             @if (pipelineId$|async; as pipelineId) {
                 <h1>
                     {{ pipelineId }}
                 </h1>
             }
-        }
-    </mat-toolbar>
-</div>
+        </mat-toolbar>
+    </div>
 
-<div class="ga-content-container">
-    @if (jobs$|async; as jobs) {
-        <mat-nav-list>
-            @for (job of jobs; track job.id) {
-                <mat-list-item>
-                    <mat-icon matListItemIcon [ngClass]="job.status|gaStateColorClass">
-                        {{ job.status|gaStateIcon }}
-                    </mat-icon>
-                    <span matListItemTitle
-                          [routerLink]="['/', (instance$|async)?.host, 'projects',(project$|async)?.id, 'jobs', job.id]">{{ job.name }}</span>
-                    <span matListItemLine>{{ job.stage }}</span>
-                    @if (job.status === 'manual') {
-                        <span matListItemMeta class="pt-half">
-                        <button mat-icon-button color="primary" (click)="playJob(job)">
+    <div class="ga-content-container">
+        @if (jobs$|async; as jobs) {
+            <mat-nav-list>
+                @for (job of jobs; track job.id) {
+                    <mat-list-item>
+                        <mat-icon matListItemIcon [ngClass]="job.status|gaStateColorClass">
+                            {{ job.status|gaStateIcon }}
+                        </mat-icon>
+                        <span matListItemTitle
+                              [routerLink]="['/', project.instance.host, 'projects',project.id, 'jobs', job.id]">{{ job.name }}</span>
+                        <span matListItemLine>{{ job.stage }}</span>
+                        @if (job.status === 'manual') {
+                            <span matListItemMeta class="pt-half">
+                        <button mat-icon-button color="primary" (click)="playJob(project.instance, job)">
                             <mat-icon>play_arrow</mat-icon>
                         </button>
                     </span>
-                    }
-                    @if (job.status === 'failed') {
-                        <span matListItemMeta class="pt-half">
-                        <button mat-icon-button color="primary" (click)="retryJob(job)">
+                        }
+                        @if (job.status === 'failed') {
+                            <span matListItemMeta class="pt-half">
+                        <button mat-icon-button color="primary" (click)="retryJob(project.instance, job)">
                             <mat-icon>replay</mat-icon>
                         </button>
                     </span>
-                    }
-                    @if (job.status === 'running') {
-                        <span matListItemMeta class="pt-half">
-                        <button mat-icon-button (click)="cancelJob(job)" class="text-danger">
+                        }
+                        @if (job.status === 'running') {
+                            <span matListItemMeta class="pt-half">
+                        <button mat-icon-button (click)="cancelJob(project.instance, job)" class="text-danger">
                             <mat-icon>cancel</mat-icon>
                         </button>
                     </span>
-                    }
-                </mat-list-item>
-                <!--                @if (!$last) {-->
-                        <!--                    <mat-divider></mat-divider>-->
-                        <!--                }-->
-            }
-        </mat-nav-list>
-    } @else {
-        <div class="d-flex justify-content-center my-half">
-            <mat-progress-spinner [mode]="'indeterminate'" [diameter]="24"></mat-progress-spinner>
-        </div>
-    }
-</div>
+                        }
+                    </mat-list-item>
+                    <!--                @if (!$last) {-->
+                            <!--                    <mat-divider></mat-divider>-->
+                            <!--                }-->
+                }
+            </mat-nav-list>
+        } @else {
+            <div class="d-flex justify-content-center my-half">
+                <mat-progress-spinner [mode]="'indeterminate'" [diameter]="24"></mat-progress-spinner>
+            </div>
+        }
+    </div>
+}

@@ -43,24 +43,27 @@ import {InstanceContext} from "../instance/instance-context.service";
 })
 export class ProjectListComponent {
 
-    public instance$ = this.instanceContext.watchInstance();
+    public instance$ = this.instanceContext.watchInstance().pipe(filter(isNonNull));
 
     private refresh$ = new BehaviorSubject<number | null>(null);
 
     public searchControl = new FormControl('', {nonNullable: true});
 
-    public projects$ = this.instance$.pipe(
-        filter(isNonNull),
-        switchMap((instance) =>
+    private instanceApi$ = this.instance$.pipe(
+        map((instance) => this.api.instance(instance))
+    );
+
+    public projects$ = this.instanceApi$.pipe(
+        switchMap((instanceApi) =>
             this.cacheService.cached(
-                instance.host + '_projects_with_membership',
-                () => this.api.projects.list(true),
+                instanceApi.instance.host + '_projects_with_membership',
+                () => instanceApi.projects.list(true),
                 60 * 5, // 5 minutes
                 this.refresh$,
             )
         ),
         map((projects) => projects.sort((a, b) => a.last_activity_at > b.last_activity_at ? -1 : 1))
-    )
+    );
 
     public filteredProjects$ = combineLatest([this.projects$, this.searchControl.valueChanges.pipe(startWith(''))])
         .pipe(
@@ -72,7 +75,7 @@ export class ProjectListComponent {
                     return project.name.toLowerCase().includes(search.toLowerCase()) || project.namespace.full_path.toLowerCase().includes(search.toLowerCase());
                 });
             })
-        )
+        );
 
     constructor(
         private readonly instanceContext: InstanceContext,

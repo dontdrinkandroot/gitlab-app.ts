@@ -1,35 +1,37 @@
-<div class="ga-mat-fixed-toolbar-container">
-    <mat-toolbar>
-        <ga-mat-sidenav-toggle></ga-mat-sidenav-toggle>
-        @if (project$|async; as project) {
+@if (project$|async; as project) {
+    <div class="ga-mat-fixed-toolbar-container">
+        <mat-toolbar>
+            <ga-mat-sidenav-toggle></ga-mat-sidenav-toggle>
             <h1>{{ project.name }}</h1>
-        }
-    </mat-toolbar>
-</div>
+        </mat-toolbar>
+    </div>
 
-<div class="ga-content-container">
-    @if (latestPipelines$|async; as latestPipelines) {
-        <div class="my-half">
-            <mat-nav-list>
-                <div matSubheader class="mat-title-small">Recent pipelines</div>
-                @for (pipeline of latestPipelines; track pipeline.id) {
-                    <a mat-list-item
-                       [routerLink]="['/', (instance$|async)?.host, 'projects', pipeline.project_id, 'pipelines', pipeline.id]">
-                        <mat-icon matListItemIcon [ngClass]="pipeline.status|gaStateColorClass">
-                            {{ pipeline.status|gaStateIcon }}
-                        </mat-icon>
-                        <span matListItemTitle>{{ pipeline.ref }}</span>
-                        <span matListItemLine>{{ pipeline.created_at | date: 'short' }}</span>
-                    </a>
-                    <!--                    @if (!$last) {-->
-                            <!--                        <mat-divider></mat-divider>-->
-                            <!--                    }-->
-                }
-            </mat-nav-list>
-        </div>
-    } @else {
-        <div class="d-flex justify-content-center my-half">
-            <mat-progress-spinner [mode]="'indeterminate'" [diameter]="24"></mat-progress-spinner>
-        </div>
-    }
-</div>
+    <div class="ga-content-container">
+        @if (latestPipelines$|async; as latestPipelines) {
+            <div class="my-half">
+                <mat-nav-list>
+                    <div matSubheader class="mat-title-small">Recent pipelines</div>
+                    @for (pipeline of latestPipelines; track pipeline.id) {
+                        @if (project$|async; as project) {
+                            <a mat-list-item
+                               [routerLink]="['/', project.instance.host, 'projects', pipeline.project_id, 'pipelines', pipeline.id]">
+                                <mat-icon matListItemIcon [ngClass]="pipeline.status|gaStateColorClass">
+                                    {{ pipeline.status|gaStateIcon }}
+                                </mat-icon>
+                                <span matListItemTitle>{{ pipeline.ref }}</span>
+                                <span matListItemLine>{{ pipeline.created_at | date: 'short' }}</span>
+                            </a>
+                        }
+                        <!--                    @if (!$last) {-->
+                                <!--                        <mat-divider></mat-divider>-->
+                                <!--                    }-->
+                    }
+                </mat-nav-list>
+            </div>
+        } @else {
+            <div class="d-flex justify-content-center my-half">
+                <mat-progress-spinner [mode]="'indeterminate'" [diameter]="24"></mat-progress-spinner>
+            </div>
+        }
+    </div>
+}

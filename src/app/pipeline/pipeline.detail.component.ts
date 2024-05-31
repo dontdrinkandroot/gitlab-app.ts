@@ -6,7 +6,6 @@ import {ActivatedRoute, RouterLink} from "@angular/router";
 import {map, switchMap} from "rxjs/operators";
 import {combineLatest, filter, interval, Observable, startWith} from "rxjs";
 import {ApiService} from "../api/api.service";
-import {ProjectService} from "../project/project.service";
 import {isNonNull} from "../rxjs/extensions";
 import {MatListModule} from "@angular/material/list";
 import {MatIconModule} from "@angular/material/icon";
@@ -16,6 +15,8 @@ import {Job} from "../job/job";
 import {MatButtonModule} from "@angular/material/button";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {InstanceContext} from "../instance/instance-context.service";
+import {InstanceConfig} from "../instance/instance-config";
+import {ProjectContext} from "../project/project-context.service";
 
 @Component({
     standalone: true,
@@ -36,41 +37,37 @@ import {InstanceContext} from "../instance/instance-context.service";
 })
 export class PipelineDetailComponent {
 
-    public instance$ = this.instanceContext.watchInstance().pipe(filter(isNonNull))
+    public project$ = this.projectContext.watchProject().pipe(filter(isNonNull));
 
-    public project$;
-
-    public pipelineId$: Observable<number>;
+    public pipelineId$: Observable<number> = this.route.params.pipe(map(params => +params['pipelineId']));
 
     public jobs$;
 
     constructor(
-        route: ActivatedRoute,
-        projectService: ProjectService,
+        private readonly route: ActivatedRoute,
+        private readonly projectContext: ProjectContext,
         private readonly api: ApiService,
         private readonly instanceContext: InstanceContext
     ) {
-        this.pipelineId$ = route.params.pipe(map(params => +params['pipelineId']));
-        this.project$ = projectService.watchCurrentProject().pipe(filter(isNonNull));
         this.jobs$ = combineLatest([
             this.project$,
             this.pipelineId$,
             interval(10000).pipe(startWith(0))
         ]).pipe(
-            switchMap(([project, pipelineId]) => api.projects.get(project.id).pipelines().get(pipelineId).jobs()),
+            switchMap(([project, pipelineId]) => api.instance(project.instance).projects.get(project.id).pipelines.get(pipelineId).jobs()),
             map(jobs => jobs.sort((a, b) => a.id - b.id))
         );
     }
 
-    public playJob(job: Job) {
-        this.api.projects.get(job.pipeline.project_id).jobs().get(job.id).play().subscribe();
+    public playJob(instance: InstanceConfig, job: Job) {
+        this.api.instance(instance).projects.get(job.pipeline.project_id).jobs().get(job.id).play().subscribe();
     }
 
-    public retryJob(job: Job) {
-        this.api.projects.get(job.pipeline.project_id).jobs().get(job.id).retry().subscribe();
+    public retryJob(instance: InstanceConfig, job: Job) {
+        this.api.instance(instance).projects.get(job.pipeline.project_id).jobs().get(job.id).retry().subscribe();
     }
 
-    public cancelJob(job: Job) {
-        this.api.projects.get(job.pipeline.project_id).jobs().get(job.id).cancel().subscribe();
+    public cancelJob(instance: InstanceConfig, job: Job) {
+        this.api.instance(instance).projects.get(job.pipeline.project_id).jobs().get(job.id).cancel().subscribe();
     }
 }

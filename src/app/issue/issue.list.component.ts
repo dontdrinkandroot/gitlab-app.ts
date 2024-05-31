@@ -1,7 +1,6 @@
 import {Component} from "@angular/core";
-import {ProjectService} from "../project/project.service";
 import {ApiService} from "../api/api.service";
-import {filter, switchMap, tap} from "rxjs";
+import {filter, switchMap} from "rxjs";
 import {isNonNull} from "../rxjs/extensions";
 import {AsyncPipe, DatePipe, NgClass} from "@angular/common";
 import {MatToolbarModule} from "@angular/material/toolbar";
@@ -10,7 +9,7 @@ import {MatListModule} from "@angular/material/list";
 import {MatIconModule} from "@angular/material/icon";
 import {RouterLink} from "@angular/router";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
-import {InstanceContext} from "../instance/instance-context.service";
+import {ProjectContext} from "../project/project-context.service";
 
 @Component({
     standalone: true,
@@ -29,21 +28,16 @@ import {InstanceContext} from "../instance/instance-context.service";
 })
 export class IssueListComponent {
 
-    public instance$ = this.instanceContext.watchInstance();
-
-    public project$ = this.projectService.watchCurrentProject();
+    public project$ = this.projectContext.watchProject().pipe(filter(isNonNull));
 
     public issues$ = this.project$.pipe(
-        tap(console.log),
         filter(isNonNull),
-        tap(console.log),
-        switchMap(project => this.api.projects.get(project.id).issues().list(100)),
+        switchMap(project => this.api.instance(project.instance).projects.get(project.id).issues().list(100)),
     );
 
     constructor(
-        private readonly projectService: ProjectService,
+        private readonly projectContext: ProjectContext,
         private readonly api: ApiService,
-        private readonly instanceContext: InstanceContext
     ) {
     }
 }

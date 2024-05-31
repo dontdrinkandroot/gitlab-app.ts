@@ -4,7 +4,6 @@ import {RouterLink} from "@angular/router";
 import {AsyncPipe, DatePipe, NgClass} from "@angular/common";
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {SidenavToggleComponent} from "../sidenav/sidenav-toggle.component";
-import {ProjectService} from "./project.service";
 import {switchMap} from "rxjs/operators";
 import {isNonNull} from "../rxjs/extensions";
 import {filter} from "rxjs";
@@ -13,7 +12,7 @@ import {MatListModule} from "@angular/material/list";
 import {MatIconModule} from "@angular/material/icon";
 import {StateColorClassPipe} from "../pipeline/state-color-class.pipe";
 import {StateIconPipe} from "../pipeline/state-icon.pipe";
-import {InstanceContext} from "../instance/instance-context.service";
+import {ProjectContext} from "./project-context.service";
 
 @Component({
     standalone: true,
@@ -34,19 +33,15 @@ import {InstanceContext} from "../instance/instance-context.service";
 })
 export class ProjectDetailComponent {
 
-    public project$ = this.projectService.watchCurrentProject();
-
-    public instance$ = this.instanceContext.watchInstance();
+    public project$ = this.projectContext.watchProject().pipe(filter(isNonNull));
 
     public latestPipelines$ = this.project$.pipe(
-        filter(isNonNull),
-        switchMap(project => this.api.projects.get(project.id).pipelines().list(5))
+        switchMap(project => this.api.instance(project.instance).projects.get(project.id).pipelines.list(5))
     );
 
     constructor(
         private readonly api: ApiService,
-        private readonly instanceContext: InstanceContext,
-        private readonly projectService: ProjectService
+        private readonly projectContext: ProjectContext
     ) {
     }
 }

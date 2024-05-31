@@ -12,7 +12,7 @@
         <h2 class="mat-title-small mx-full">Subgroups</h2>
         <mat-nav-list class="pt-none mb-full">
             @for (subgroup of subgroups; track subgroup.id) {
-                <a mat-list-item [routerLink]="['/', instance.host, 'groups', subgroup.id]">
+                <a mat-list-item [routerLink]="['/', (instance$|async)?.host, 'groups', subgroup.id]">
                     @if (subgroup.avatar_url) {
                         <img matListItemAvatar [ngSrc]="subgroup.id|gaGroupAvatarUrl|gaAppendToken" width="64"
                              height="64"/>
@@ -35,7 +35,7 @@
         <h2 class="mat-title-small mx-full">Projects</h2>
         <mat-nav-list class="pt-none mb-full">
             @for (project of projects; track project.id) {
-                <a mat-list-item [routerLink]="['/',instance.host, 'projects',project.id]">
+                <a mat-list-item [routerLink]="['/',(instance$|async)?.host, 'projects',project.id]">
                     @if (project.avatar_url) {
                         <img matListItemAvatar [ngSrc]="project.id|gaProjectAvatarUrl|gaAppendToken" width="64"
                              height="64"/>

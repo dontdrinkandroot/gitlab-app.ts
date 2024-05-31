@@ -9,6 +9,7 @@ import {NgProgressHttpModule} from "ngx-progressbar/http";
 import {provideServiceWorker} from '@angular/service-worker';
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from "@angular/material/form-field";
 import {InstanceService} from "./instance/instance.service";
+import {ProjectContext} from "./project/project-context.service";
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -35,6 +36,13 @@ export const appConfig: ApplicationConfig = {
             multi: true,
             useValue() {
                 inject(InstanceService).registerRouteListener()
+            }
+        },
+        {
+            provide: ENVIRONMENT_INITIALIZER,
+            multi: true,
+            useValue() {
+                inject(ProjectContext).registerRouteListener()
             }
         },
         provideServiceWorker('ngsw-worker.js', {
