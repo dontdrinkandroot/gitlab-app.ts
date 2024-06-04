@@ -59,8 +59,8 @@ export class ProjectListComponent {
         switchMap((instanceApi) =>
             this.cacheService.cached(
                 this.route.data.pipe(map(data => data['cachedProjects'])),
-                () => instanceApi.projects.list(true),
-                60 * 5, // 5 minutes
+                () => instanceApi.projects.list(true, true),
+                60, // 1 Minute
                 this.refresh$,
             )
         ),
@@ -101,6 +101,3 @@ export const ProjectListCacheResolver: ResolveFn<CacheResult<Project[]>> = (rout
         switchMap((instance) => cacheService.cache.getResult<Project[]>(instance.host + '_projects_with_membership')),
     );
 }
-
-
-

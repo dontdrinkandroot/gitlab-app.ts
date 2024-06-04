@@ -38,4 +38,8 @@ export class CacheService {
             })
         );
     }
+
+    public async getResult<T>(key: string): Promise<CacheResult<T>> {
+        return this.cache.getResult<T>(key);
+    }
 }

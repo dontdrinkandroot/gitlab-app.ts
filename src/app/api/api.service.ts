@@ -4,8 +4,8 @@ import {Observable} from "rxjs";
 import {Project} from "../project/project";
 import {Pipeline} from "../pipeline/pipeline";
 import {Job} from "../job/job";
-import {ApiClientService, HttpGetOptions, HttpGetPaginatedOptions} from "./api-client.service";
-import {Issue} from "./model";
+import {ApiClientService, GetParams, HttpGetOptions, HttpGetPaginatedOptions} from "./api-client.service";
+import {Issue, IssueNote} from "./model";
 import {InstanceConfig} from "../instance/instance-config";
 
 class GroupApi {
@@ -62,6 +62,8 @@ class ProjectIssuesApi {
     ) {
     }
 
+    public get = (issueId: number) => new ProjectIssueApi(this.instance, this.apiClient, this.projectId, issueId);
+
     public list = (limit: number | null = null): Observable<Issue[]> => {
         let options: HttpGetPaginatedOptions = {};
 
@@ -94,6 +96,20 @@ class ProjectIssuesApi {
 
         return this.apiClient.httpPaginatedGetAll<Issue>(this.instance, `/projects/${this.projectId}/issues?state=closed`, options);
     }
+}
+
+class ProjectIssueApi {
+    constructor(
+        private readonly instance: InstanceConfig,
+        private readonly apiClient: ApiClientService,
+        private readonly projectId: number,
+        private readonly issueId: number
+    ) {
+    }
+
+    public fetch = (): Observable<Issue> => this.apiClient.httpGet<Issue>(this.instance, `/projects/${this.projectId}/issues/${this.issueId}`);
+
+    public notes = () => this.apiClient.httpPaginatedGetAll<IssueNote>(this.instance, `/projects/${this.projectId}/issues/${this.issueId}/notes`);
 }
 
 class ProjectPipelinesApi {
@@ -158,11 +174,19 @@ class ProjectsApi {
     ) {
     }
 
-    public list = (membership: boolean | null = null): Observable<Project[]> => {
+    public list = (
+        membership: boolean | null = null,
+        simple: boolean | null = null
+    ): Observable<Project[]> => {
         let options: HttpGetOptions = {};
+        const params: GetParams = {};
         if (membership !== null) {
-            options.params = {membership: membership};
+            params['membership'] = membership;
         }
+        if (simple !== null) {
+            params['simple'] = simple;
+        }
+        options.params = params;
 
         return this.apiClient.httpPaginatedGetAll<Project>(this.instance, '/projects', options);
     }

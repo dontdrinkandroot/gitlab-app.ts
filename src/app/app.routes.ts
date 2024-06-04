@@ -12,7 +12,12 @@ import {PipelineDetailComponent} from "./pipeline/pipeline.detail.component";
 import {GroupListComponent} from "./group/group.list.component";
 import {ProjectListCacheResolver, ProjectListComponent} from "./project/project.list.component";
 import {JobDetailComponent} from "./job/job.detail.component";
-import {IssueListComponent} from "./issue/issue.list.component";
+import {
+    IssueListComponent,
+    ProjectIssueListClosedCacheResolver,
+    ProjectIssueListOpenCacheResolver
+} from "./issue/issue.list.component";
+import {IssueDetailComponent, ProjectIssueCacheResolver} from "./issue/issue.detail.component";
 
 export const routes: Routes = [
     {
@@ -79,7 +84,18 @@ export const routes: Routes = [
                                     {
                                         path: '',
                                         component: IssueListComponent,
+                                        resolve: {
+                                            issuesOpen: ProjectIssueListOpenCacheResolver,
+                                            issuesClosed: ProjectIssueListClosedCacheResolver,
+                                        }
                                     },
+                                    {
+                                        path: ':issueId',
+                                        component: IssueDetailComponent,
+                                        resolve: {
+                                            issue: ProjectIssueCacheResolver
+                                        }
+                                    }
                                 ]
                             },
                             {

@@ -10,6 +10,7 @@ import {provideServiceWorker} from '@angular/service-worker';
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from "@angular/material/form-field";
 import {InstanceService} from "./instance/instance.service";
 import {ProjectContext} from "./project/project-context.service";
+import {MAT_CARD_CONFIG} from "@angular/material/card";
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -19,6 +20,12 @@ export const appConfig: ApplicationConfig = {
         provideAnimationsAsync(),
         importProvidersFrom(NgProgressHttpModule),
         provideHttpClient(withInterceptorsFromDi()),
+        {
+            provide: MAT_CARD_CONFIG,
+            useValue: {
+                appearance: 'outlined'
+            }
+        },
         {
             provide: NG_PROGRESS_CONFIG,
             useValue: {

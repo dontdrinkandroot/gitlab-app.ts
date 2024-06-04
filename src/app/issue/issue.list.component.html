@@ -16,7 +16,7 @@
                             <mat-nav-list>
                                 @for (issue of issues; track issue.id) {
                                     <a mat-list-item
-                                       [routerLink]="['/', project.instance.host, 'projects', issue.project_id, 'issues', issue.id]">
+                                       [routerLink]="['/', project.instance.host, 'projects', issue.project_id, 'issues', issue.iid]">
                                         <!--                        <mat-icon matListItemIcon [ngClass]="issue.status|gaStateColorClass">-->
                                         <!--                            {{ issue.status|gaStateIcon }}-->
                                         <!--                        </mat-icon>-->
