@@ -41,7 +41,7 @@ export class ProjectDetailComponent {
 
     constructor(
         private readonly api: ApiService,
-        private readonly projectContext: ProjectContext
+        private readonly projectContext: ProjectContext,
     ) {
     }
 }

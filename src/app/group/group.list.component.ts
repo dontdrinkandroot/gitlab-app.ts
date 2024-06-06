@@ -15,6 +15,7 @@ import {GroupTreeNode} from "./group-tree-node";
 import {Group} from "./group";
 import {InstanceContext} from "../instance/instance-context.service";
 import {isNonNull} from "../rxjs/extensions";
+import {CacheService} from "../cache/cache.service";
 
 @Component({
     standalone: true,
@@ -34,10 +35,18 @@ export class GroupListComponent implements OnDestroy {
 
     constructor(
         private readonly api: ApiService,
-        private readonly instanceContext: InstanceContext
+        private readonly instanceContext: InstanceContext,
+        private readonly cacheService: CacheService
     ) {
-        this.dataSubscription = this.instance$
-            .pipe(switchMap(instance => this.api.instance(instance).groups.list()))
+        const $groups = this.instance$.pipe(
+            switchMap(instance => this.cacheService.cached(
+                instance.host + '_groups',
+                () => this.api.instance(instance).groups.list(),
+                60
+            ))
+        );
+
+        this.dataSubscription = $groups
             .subscribe({
                 next: groups => this.dataSource.data = this.buildGroupTree(groups)
             })

@@ -1,4 +1,4 @@
-import {Component, inject} from "@angular/core";
+import {Component} from "@angular/core";
 import {ApiService} from "../api/api.service";
 import {filter, switchMap} from "rxjs";
 import {isNonNull} from "../rxjs/extensions";
@@ -7,15 +7,12 @@ import {MatToolbarModule} from "@angular/material/toolbar";
 import {SidenavToggleComponent} from "../sidenav/sidenav-toggle.component";
 import {MatListModule} from "@angular/material/list";
 import {MatIconModule} from "@angular/material/icon";
-import {ActivatedRoute, ResolveFn, RouterLink} from "@angular/router";
+import {RouterLink} from "@angular/router";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
-import {ProjectContext} from "../project/project-context.service";
+import {ProjectContext, ProjectWithInstance} from "../project/project-context.service";
 import {MatChipsModule} from "@angular/material/chips";
 import {MatTabsModule} from "@angular/material/tabs";
-import {CacheResult} from "../cache/cache";
 import {CacheService} from "../cache/cache.service";
-import {Issue} from "../api/model";
-import {map} from "rxjs/operators";
 
 @Component({
     standalone: true,
@@ -38,53 +35,27 @@ export class IssueListComponent {
 
     public project$ = this.projectContext.watchProject().pipe(filter(isNonNull));
 
-    // public openIssues$ = this.project$.pipe(
-    //     switchMap(project => this.api.instance(project.instance).projects.get(project.id).issues().listOpen()),
-    // );
+    private projectApi = (project: ProjectWithInstance) => this.api.instance(project.instance).projects.get(project.id);
 
-    private projectApi$ = this.project$.pipe(
-        map((project) => this.api.instance(project.instance).projects.get(project.id))
-    );
-
-    public openIssues$ = this.projectApi$.pipe(
-        switchMap(projectApi => this.cacheService.cached(
-            this.route.data.pipe(map(data => data['issuesOpen'])),
-            () => projectApi.issues().listOpen(),
+    public openIssues$ = this.project$.pipe(
+        switchMap(project => this.cacheService.cached(
+            project.instance.host + '_projects_' + project.id + '_issues_open',
+            () => this.projectApi(project).issues().listOpen(),
             60
         )));
 
-    public closedIssues$ = this.projectApi$.pipe(
-        switchMap(projectApi => this.cacheService.cached(
-            this.route.data.pipe(map(data => data['issuesClosed'])),
-            () => projectApi.issues().listClosed(),
+    public closedIssues$ = this.project$.pipe(
+        switchMap(project => this.cacheService.cached(
+            project.instance.host + '_projects_' + project.id + '_issues_closed',
+            () => this.projectApi(project).issues().listClosed(),
             60
         )));
 
     constructor(
         private readonly projectContext: ProjectContext,
         private readonly api: ApiService,
-        private readonly route: ActivatedRoute,
         private readonly cacheService: CacheService
     ) {
     }
 }
 
-export const ProjectIssueListOpenCacheResolver: ResolveFn<CacheResult<Issue[]>> = (route, state) => {
-    const projectContext = inject(ProjectContext);
-    const cacheService = inject(CacheService);
-
-    return projectContext.watchProject().pipe(
-        filter(isNonNull),
-        switchMap(project => cacheService.getResult<Issue[]>(project.instance.host + '_projects_' + project.id + '_issues_open')),
-    );
-}
-
-export const ProjectIssueListClosedCacheResolver: ResolveFn<CacheResult<Issue[]>> = (route, state) => {
-    const projectContext = inject(ProjectContext);
-    const cacheService = inject(CacheService);
-
-    return projectContext.watchProject().pipe(
-        filter(isNonNull),
-        switchMap(project => cacheService.getResult<Issue[]>(project.instance.host + '_projects_' + project.id + '_issues_closed')),
-    );
-}

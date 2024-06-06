@@ -1,4 +1,4 @@
-import {Component, inject} from "@angular/core";
+import {Component} from "@angular/core";
 import {AsyncPipe, NgOptimizedImage} from "@angular/common";
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {SidenavToggleComponent} from "../sidenav/sidenav-toggle.component";
@@ -6,7 +6,7 @@ import {ApiService} from "../api/api.service";
 import {MatListModule} from "@angular/material/list";
 import {AppendTokenPipe} from "../instance/append-token.pipe";
 import {ProjectAvatarUrlPipePipe} from "./project-avatar-url.pipe";
-import {ActivatedRoute, ResolveFn, RouterLink} from "@angular/router";
+import {ActivatedRoute, RouterLink} from "@angular/router";
 import {map, switchMap} from "rxjs/operators";
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
 import {MatInputModule} from "@angular/material/input";
@@ -19,8 +19,6 @@ import {MatIconModule} from "@angular/material/icon";
 import {CacheService} from "../cache/cache.service";
 import {isNonNull} from "../rxjs/extensions";
 import {InstanceContext} from "../instance/instance-context.service";
-import {Project} from "./project";
-import {CacheResult} from "../cache/cache";
 
 @Component({
     standalone: true,
@@ -51,16 +49,12 @@ export class ProjectListComponent {
 
     public searchControl = new FormControl('', {nonNullable: true});
 
-    private instanceApi$ = this.instance$.pipe(
-        map((instance) => this.api.instance(instance))
-    );
-
-    public projects$ = this.instanceApi$.pipe(
-        switchMap((instanceApi) =>
+    public projects$ = this.instance$.pipe(
+        switchMap((instance) =>
             this.cacheService.cached(
-                this.route.data.pipe(map(data => data['cachedProjects'])),
-                () => instanceApi.projects.list(true, true),
-                60, // 1 Minute
+                instance.host + '_projects_with_membership',
+                () => this.api.instance(instance).projects.list(true, true),
+                60,
                 this.refresh$,
             )
         ),
@@ -90,14 +84,4 @@ export class ProjectListComponent {
     public refresh() {
         this.refresh$.next(Date.now());
     }
-}
-
-export const ProjectListCacheResolver: ResolveFn<CacheResult<Project[]>> = (route, state) => {
-    const instanceContext = inject(InstanceContext);
-    const cacheService = inject(CacheService);
-
-    return instanceContext.watchInstance().pipe(
-        filter(isNonNull),
-        switchMap((instance) => cacheService.cache.getResult<Project[]>(instance.host + '_projects_with_membership')),
-    );
 }
