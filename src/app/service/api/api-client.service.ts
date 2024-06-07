@@ -5,6 +5,10 @@ import {catchError, EMPTY, expand, Observable, reduce} from "rxjs";
 import {map} from "rxjs/operators";
 import {InstanceConfig} from "../../model/instance-config";
 
+export type OptionalGetParams = {
+    [param: string]: string | number | boolean | ReadonlyArray<string | number | boolean> | undefined;
+}
+
 export type GetParams = { [param: string]: string | number | boolean | ReadonlyArray<string | number | boolean>; }
 
 export type HttpGetOptions = {
@@ -98,5 +102,16 @@ export class ApiClientService {
 
     private getUrl(instance: InstanceConfig, path: string): string {
         return 'https://' + instance.host + '/api/v4' + path;
+    }
+
+    /** Unsets all properties where the value is undefined */
+    public convertParams(params: OptionalGetParams): GetParams {
+        const converted: GetParams = {};
+        for (const key in params) {
+            if (params[key] !== undefined) {
+                converted[key] = params[key]!;
+            }
+        }
+        return converted;
     }
 }

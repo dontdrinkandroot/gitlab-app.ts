@@ -12,6 +12,7 @@ import {IssueDetailComponent} from "./component/instance/project/issue/issue.det
 import {JobDetailComponent} from "./component/instance/project/job/job.detail.component";
 import {GroupDetailComponent} from "./component/instance/group/group.detail.component";
 import {NotFoundComponent} from "./component/not-found/not-found.component";
+import {InstanceDetailComponent} from "./component/instance/instance-detail.component";
 
 export const routes: Routes = [
     {
@@ -23,8 +24,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                redirectTo: 'projects',
-                pathMatch: 'full'
+                component: InstanceDetailComponent,
             },
             {
                 path: 'groups',

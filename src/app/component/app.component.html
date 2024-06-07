@@ -15,7 +15,7 @@
         @if (currentInstance$|async; as currentInstance) {
             <mat-nav-list>
 
-                <mat-list-item>
+                <a mat-list-item [routerLink]="['/', currentInstance.host]">
                     <p matListItemTitle>{{ currentInstance.host }}</p>
                     <p matListItemLine>{{ currentInstance.username }}</p>
                     <div matListItemMeta>
@@ -23,7 +23,7 @@
                             <mat-icon>swap_horiz</mat-icon>
                         </a>
                     </div>
-                </mat-list-item>
+                </a>
 
                 <mat-divider></mat-divider>
 
