@@ -1,17 +1,17 @@
 import {Routes} from '@angular/router';
-import {NotFoundComponent} from "./not-found/not-found.component";
-import {GroupDetailComponent} from "./group/group.detail.component";
-import {ProjectDetailComponent} from "./project/project.detail.component";
-import {IndexComponent} from "./index/index.component";
-import {PipelineListComponent} from "./pipeline/pipeline.list.component";
-import {ProjectComponent} from "./project/project.component";
-import {projectResolver} from "./project/project-resolver.service";
-import {PipelineDetailComponent} from "./pipeline/pipeline.detail.component";
-import {GroupListComponent} from "./group/group.list.component";
-import {ProjectListComponent} from "./project/project.list.component";
-import {JobDetailComponent} from "./job/job.detail.component";
-import {IssueListComponent,} from "./issue/issue.list.component";
-import {IssueDetailComponent} from "./issue/issue.detail.component";
+import {IndexComponent} from "./component/index/index.component";
+import {GroupListComponent} from "./component/instance/group/group.list.component";
+import {ProjectListComponent} from "./component/instance/project/project.list.component";
+import {ProjectComponent} from "./component/instance/project/project.component";
+import {projectResolver} from "./resolver/project-resolver";
+import {ProjectDetailComponent} from "./component/instance/project/project.detail.component";
+import {PipelineListComponent} from "./component/instance/project/pipeline/pipeline.list.component";
+import {PipelineDetailComponent} from "./component/instance/project/pipeline/pipeline.detail.component";
+import {IssueListComponent} from "./component/instance/project/issue/issue.list.component";
+import {IssueDetailComponent} from "./component/instance/project/issue/issue.detail.component";
+import {JobDetailComponent} from "./component/instance/project/job/job.detail.component";
+import {GroupDetailComponent} from "./component/instance/group/group.detail.component";
+import {NotFoundComponent} from "./component/not-found/not-found.component";
 
 export const routes: Routes = [
     {

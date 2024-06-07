@@ -8,9 +8,9 @@ import {provideHttpClient, withInterceptorsFromDi} from "@angular/common/http";
 import {NgProgressHttpModule} from "ngx-progressbar/http";
 import {provideServiceWorker} from '@angular/service-worker';
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from "@angular/material/form-field";
-import {InstanceService} from "./instance/instance.service";
-import {ProjectContext} from "./project/project-context.service";
 import {MAT_CARD_CONFIG} from "@angular/material/card";
+import {InstanceService} from "./service/instance.service";
+import {ProjectContext} from "./service/project-context.service";
 
 export const appConfig: ApplicationConfig = {
     providers: [
